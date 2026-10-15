@@ -7,3 +7,15 @@ services:
     volumes:
       - .:/app
     command: php -S 0.0.0.0:8103 -t public
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'php',
+          '-r',
+          "$$socket = @fsockopen('127.0.0.1', 8103); exit($$socket === false ? 1 : 0);",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 1s
