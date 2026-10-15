@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    working_dir: /app
+    ports:
+      - '8103:8103'
+    volumes:
+      - .:/app
+    command: php -S 0.0.0.0:8103 -t public
