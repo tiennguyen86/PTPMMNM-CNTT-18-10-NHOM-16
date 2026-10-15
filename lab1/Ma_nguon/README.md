@@ -1,6 +1,8 @@
 # Lab 01 — Vận hành dự án trên linux và viết shell script
 
-Mã mẫu cho phần hướng dẫn và mã khởi đầu cho bài tự làm.
+**Nhóm 16 — Lớp CNTT-18-10** (Nguyễn Hữu Tiến - 1871020569, Nguyễn Việt Anh - 1871020047, Nguyễn Tiến Thuận - 1871020562)
+
+*Trạng thái: Hoàn thành bài mẫu & bài mở rộng (CHECK_ENV=PASS, SHELL_CASES=4 FAILED=0)*
 
 ## Mở bài
 

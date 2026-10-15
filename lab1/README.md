@@ -1,5 +1,12 @@
 # Lab01 — Bài thực hành dành cho sinh viên
 
+**Nhóm 16 — Lớp CNTT-18-10**
+- Nguyễn Hữu Tiến (1871020569) - Nhóm trưởng
+- Nguyễn Việt Anh (1871020047)
+- Nguyễn Tiến Thuận (1871020562)
+
+*Trạng thái: Đã hoàn thành (CHECK_ENV=PASS, SHELL_CASES=4 FAILED=0)*
+
 Nhánh này chỉ chứa một bài lab. Dùng Ubuntu/WSL, PHP từ 8.1 và Git.
 
 Không cần PostgreSQL hoặc Composer.

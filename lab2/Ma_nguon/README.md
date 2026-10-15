@@ -1,6 +1,8 @@
 # Lab 02 — Xây dựng module php kiểm tra điều kiện đăng ký
 
-Mã mẫu cho phần hướng dẫn và mã khởi đầu cho bài tự làm.
+**Nhóm 16 — Lớp CNTT-18-10** (Nguyễn Hữu Tiến - 1871020569, Nguyễn Việt Anh - 1871020047, Nguyễn Tiến Thuận - 1871020562)
+
+*Trạng thái: Hoàn thành bài mẫu & bài mở rộng (TESTS=5 FAILED=0, TESTS=8 FAILED=0)*
 
 ## Mở bài
 
