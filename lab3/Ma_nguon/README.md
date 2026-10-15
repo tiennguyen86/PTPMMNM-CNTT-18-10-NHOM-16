@@ -1,5 +1,6 @@
-# Lab 03 — Hiển thị sự kiện, tìm kiếm và xử lý form
+# Lab 03 — Giao diện Web so sánh Diff & Kiểm tra tương thích cấu trúc API
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10** (Nguyễn Hữu Tiến - 1871020569, Nguyễn Việt Anh - 1871020047, Nguyễn Tiến Thuận - 1871020562)
 
 *Trạng thái: Hoàn thành bài mẫu & bài mở rộng (TESTS=7 FAILED=0, TESTS=8 FAILED=0)*

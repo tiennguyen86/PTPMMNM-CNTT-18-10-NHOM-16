@@ -1,5 +1,6 @@
-# Lab 01 — Vận hành dự án trên linux và viết shell script
+# Lab 01 — Vận hành công cụ quét & kiểm tra cấu trúc API trên Linux
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10** (Nguyễn Hữu Tiến - 1871020569, Nguyễn Việt Anh - 1871020047, Nguyễn Tiến Thuận - 1871020562)
 
 *Trạng thái: Hoàn thành bài mẫu & bài mở rộng (CHECK_ENV=PASS, SHELL_CASES=4 FAILED=0)*

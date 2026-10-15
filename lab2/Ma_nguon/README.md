@@ -1,5 +1,6 @@
-# Lab 02 — Xây dựng module php kiểm tra điều kiện đăng ký
+# Lab 02 — Xây dựng module OOP kiểm tra tính tương thích cấu trúc API
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10** (Nguyễn Hữu Tiến - 1871020569, Nguyễn Việt Anh - 1871020047, Nguyễn Tiến Thuận - 1871020562)
 
 *Trạng thái: Hoàn thành bài mẫu & bài mở rộng (TESTS=5 FAILED=0, TESTS=8 FAILED=0)*

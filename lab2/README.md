@@ -1,5 +1,6 @@
-# Lab02 — Bài thực hành dành cho sinh viên
+# Lab 02 — Xây dựng module OOP kiểm tra tính tương thích cấu trúc API
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10**
 - Nguyễn Hữu Tiến (1871020569) - Nhóm trưởng
 - Nguyễn Việt Anh (1871020047)
@@ -7,9 +8,7 @@
 
 *Trạng thái: Đã hoàn thành (TESTS=5 FAILED=0, TESTS=8 FAILED=0)*
 
-Nhánh này chỉ chứa một bài lab. Dùng Ubuntu/WSL, PHP từ 8.1 và Git.
-
-Không cần PostgreSQL hoặc Composer.
+Xây dựng các lớp hướng đối tượng (OOP) trong PHP để phân tích sự thay đổi giữa các phiên bản API Schema (JSON Schema / OpenAPI), phân loại Breaking Changes và Non-breaking Changes, kiểm tra quy tắc tương thích ngược (Backward Compatibility).
 
 ## Chuẩn bị trên Ubuntu/WSL
 

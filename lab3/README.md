@@ -1,5 +1,6 @@
-# Lab03 — Bài thực hành dành cho sinh viên
+# Lab 03 — Giao diện Web so sánh Diff & Kiểm tra tương thích cấu trúc API
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10**
 - Nguyễn Hữu Tiến (1871020569) - Nhóm trưởng
 - Nguyễn Việt Anh (1871020047)
@@ -7,9 +8,7 @@
 
 *Trạng thái: Đã hoàn thành (TESTS=7 FAILED=0, TESTS=8 FAILED=0)*
 
-Nhánh này chỉ chứa một bài lab. Dùng Ubuntu/WSL, PHP từ 8.1 và Git.
-
-Không cần PostgreSQL hoặc Composer.
+Xây dựng ứng dụng Web tương tác cho phép nhập/chọn đặc tả API Schema V1 và V2, thực hiện so sánh Visual Diff, lọc các thay đổi theo mức độ nghiêm trọng (Breaking / Non-breaking), và đánh giá tính tương thích ngược tức thì.
 
 ## Chuẩn bị trên Ubuntu/WSL
 

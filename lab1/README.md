@@ -1,5 +1,6 @@
-# Lab01 — Bài thực hành dành cho sinh viên
+# Lab 01 — Vận hành công cụ quét & kiểm tra cấu trúc API trên Linux
 
+**Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API**
 **Nhóm 16 — Lớp CNTT-18-10**
 - Nguyễn Hữu Tiến (1871020569) - Nhóm trưởng
 - Nguyễn Việt Anh (1871020047)
@@ -7,9 +8,7 @@
 
 *Trạng thái: Đã hoàn thành (CHECK_ENV=PASS, SHELL_CASES=4 FAILED=0)*
 
-Nhánh này chỉ chứa một bài lab. Dùng Ubuntu/WSL, PHP từ 8.1 và Git.
-
-Không cần PostgreSQL hoặc Composer.
+Thực hành triển khai môi trường Linux/WSL, tự động hóa bằng Shell Script để quét, phân tích cú pháp và kiểm tra tính toàn vẹn của mã nguồn và các file đặc tả API.
 
 ## Chuẩn bị trên Ubuntu/WSL
 

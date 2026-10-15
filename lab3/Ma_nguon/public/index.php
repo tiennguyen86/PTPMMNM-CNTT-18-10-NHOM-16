@@ -10,8 +10,18 @@ require_once __DIR__ . '/../templates/event-presentation.php';
 require __DIR__ . '/../templates/header.php';
 ?>
 <div class="page-heading page-heading--list page-search">
-<h1>Sự kiện</h1>
-<p>Tìm theo tên và xem thông tin sự kiện.</p>
+<h1>⚡ Danh Mục API & Điểm Cuối Dịch Vụ</h1>
+<p>Đề tài số 2: Xây dựng công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API — Nhóm 16 (CNTT-18-10)</p>
+</div>
+
+<div style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: #fff; padding: 1.25rem 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+    <div>
+        <h3 style="margin: 0; color: #fff; font-size: 1.2rem;">⚡ Công cụ Kiểm Tra Tương Thích & So Sánh API Schema (Đề 2)</h3>
+        <p style="margin: 0.25rem 0 0 0; opacity: 0.9; font-size: 0.95rem;">Tự động phát hiện Breaking Changes, thay đổi kiểu dữ liệu và trường bắt buộc giữa 2 bản API.</p>
+    </div>
+    <a href="/api-diff.php" style="background: #fff; color: #1e3a8a; padding: 0.6rem 1.25rem; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">
+        Trải nghiệm công cụ Diff ➔
+    </a>
 </div>
 <form class="search-form" method="get">
     <label class="form-field" for="q">Từ khóa
