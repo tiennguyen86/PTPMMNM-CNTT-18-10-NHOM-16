@@ -339,3 +339,15 @@ Bước 1. Lưu mã bài mẫu và bài tự làm tại Lab01/Ma\_nguon, kèm d�
 Bước 2. Chạy bash lab.sh check, bash lab.sh test và bash lab.sh extend. Thực hiện các phép kiểm tra trực tiếp trong bài và sửa lỗi trước khi nộp.
 
 Bước 3. Commit, đẩy mã lên GitHub và nộp tên nhóm/thành viên, Lab 01, liên kết Ma\_nguon tại đúng commit. Kiểm tra quyền đọc; kèm lần chạy Actions khi được yêu cầu. Hạn và địa chỉ nộp do giảng viên công bố. Nếu nhận ZIP, giữ nguyên cấu trúc trên.
+
+### Thông tin nộp bài của Nhóm 16:
+- **Lớp**: CNTT-18-10
+- **Nhóm**: 16
+- **Thành viên**:
+  1. **Nguyễn Hữu Tiến** — MSV: 1871020569 (Nhóm trưởng)
+  2. **Nguyễn Việt Anh** — MSV: 1871020047
+  3. **Nguyễn Tiến Thuận** — MSV: 1871020562
+- **Kho lưu trữ GitHub**: https://github.com/tiennguyen86/PTPMMNM-CNTT-18-10-NHOM-16.git
+- **Mã nguồn bài làm**: `lab1/Ma_nguon/`
+- **Trạng thái**: Hoàn thành toàn bộ bài mẫu và bài mở rộng (`CHECK_ENV=PASS`, `SHELL_CASES=4 FAILED=0`).
+

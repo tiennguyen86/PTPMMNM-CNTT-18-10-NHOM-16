@@ -25,8 +25,8 @@ PHP cần từ 8.1 trở lên. Các lệnh bên dưới chạy trong Ubuntu/WSL.
 ## Tải bài
 
 ```bash
-git clone --single-branch --branch lab3 https://github.com/FIT-DNU/Open-Source-Software-Development.git lab3
-cd lab3/Ma_nguon
+git clone https://github.com/tiennguyen86/PTPMMNM-CNTT-18-10-NHOM-16.git
+cd PTPMMNM-CNTT-18-10-NHOM-16/lab3/Ma_nguon
 ```
 
 ## Chạy bài
