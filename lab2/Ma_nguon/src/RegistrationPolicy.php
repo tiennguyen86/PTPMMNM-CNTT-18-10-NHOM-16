@@ -3,8 +3,15 @@ declare(strict_types=1);
 final class RegistrationPolicy {
     public function decide(int $capacity, int $registered,
         bool $open, bool $waitingEnabled): string {
-        // TODO: invalid -> rejected; closed -> rejected;
-        // available -> confirmed; full -> waiting/rejected.
-        return 'TODO';
+        if ($capacity <= 0 || $registered < 0 || $registered > $capacity) {
+            return 'rejected';
+        }
+        if (!$open) {
+            return 'rejected';
+        }
+        if ($registered < $capacity) {
+            return 'confirmed';
+        }
+        return $waitingEnabled ? 'waiting' : 'rejected';
     }
 }
