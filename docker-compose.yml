@@ -1,0 +1,78 @@
+x-lab-common: &lab-common
+  image: communitypass-labs-php:8.3
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+  volumes:
+    - .:/workspace
+  environment:
+    PGHOST: db
+    PGPORT: '5432'
+    PGDATABASE: communitypass_lab_v5
+    PGUSER: communitypass_lab_v5
+    PGPASSWORD: communitypass_lab_v5_dev
+
+services:
+  lab1:
+    <<: *lab-common
+    profiles: ['lab1']
+    working_dir: /workspace/lab1/Ma_nguon
+    ports:
+      - '8101:8101'
+    command: php -S 0.0.0.0:8101 -t public
+
+  lab2:
+    <<: *lab-common
+    profiles: ['lab2']
+    working_dir: /workspace/lab2/Ma_nguon
+    command: php demo.php
+
+  lab3:
+    <<: *lab-common
+    profiles: ['lab3']
+    working_dir: /workspace/lab3/Ma_nguon
+    ports:
+      - '8103:8103'
+    command: php -S 0.0.0.0:8103 -t public
+
+  lab4:
+    <<: *lab-common
+    profiles: ['lab4']
+    working_dir: /workspace/lab4/Ma_nguon
+    ports:
+      - '8104:8104'
+    command:
+      php -d session.name=OSSLAB4 -d session.save_path=/workspace/lab4/Ma_nguon/.local/sessions -S
+      0.0.0.0:8104 -t public
+
+  lab5:
+    <<: *lab-common
+    profiles: ['lab5']
+    working_dir: /workspace/lab5/Ma_nguon
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '8105:8105'
+    command:
+      php -d session.name=OSSLAB5 -d session.save_path=/workspace/lab5/Ma_nguon/.local/sessions -S
+      0.0.0.0:8105 -t public
+
+  db:
+    image: postgres:16-alpine
+    profiles: ['lab5']
+    environment:
+      POSTGRES_DB: communitypass_lab_v5
+      POSTGRES_USER: communitypass_lab_v5
+      POSTGRES_PASSWORD: communitypass_lab_v5_dev
+    volumes:
+      - lab5-db-data:/var/lib/postgresql/data
+      - ./lab5/Ma_nguon/database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U communitypass_lab_v5 -d communitypass_lab_v5']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  lab5-db-data:
