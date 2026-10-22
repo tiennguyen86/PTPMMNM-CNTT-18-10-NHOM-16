@@ -24,14 +24,14 @@ if (is_post()) {
 
 auth_layout_start('Đăng nhập');
 ?>
-<h1>Đăng nhập</h1>
-<p class="muted">Dành cho người phụ trách API và thành viên nhóm phát triển.</p>
+<h1>Chào mừng trở lại.</h1>
+<p class="muted">Đăng nhập để tiếp tục quản lý và kiểm tra API cùng nhóm của bạn.</p>
 <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
 <form method="post" class="stack">
     <?= csrf_field() ?>
-    <label class="field"><span>Tên đăng nhập</span><input class="input" name="username" value="<?= e($username) ?>" required autofocus></label>
-    <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required></label>
-    <button class="btn btn-primary btn-block">Đăng nhập</button>
+    <label class="field"><span>Tên đăng nhập</span><input class="input" name="username" value="<?= e($username) ?>" placeholder="Nhập tên đăng nhập" autocomplete="username" required autofocus></label>
+    <label class="field"><span>Mật khẩu</span><span class="password-input"><input class="input" type="password" name="password" id="login-password" placeholder="Nhập mật khẩu" autocomplete="current-password" required><button type="button" class="password-toggle" data-password-toggle="login-password" aria-controls="login-password" aria-pressed="false">Hiện</button></span></label>
+    <button class="btn btn-primary btn-block">Đăng nhập <?= icon('arrow') ?></button>
 </form>
 <?php if (config('allow_register')): ?>
 <p class="muted center">Chưa có tài khoản? <a href="<?= e(url('register')) ?>">Đăng ký</a></p>

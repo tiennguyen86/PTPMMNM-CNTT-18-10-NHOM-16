@@ -22,6 +22,10 @@ function icon(string $name): string
         'play'    => '<path d="M7 4v16l13-8z"/>',
         'print'   => '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/>',
         'layers'  => '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+        'menu'    => '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        'arrow'   => '<path d="M5 12h14m-5-5 5 5-5 5"/>',
+        'shield'  => '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8 12 3 3 5-6"/>',
+        'activity'=> '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
     ];
     return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
         . ($paths[$name] ?? '') . '</svg>';
@@ -111,12 +115,14 @@ function html_head(string $title): void
 <html lang="vi">
 <head>
     <meta charset="utf-8">
+    <script>document.documentElement.classList.add('js-enabled');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($title) ?> · <?= e(config('app_name')) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/app.css?v=1">
+    <link rel="stylesheet" href="assets/css/app.css?v=<?= filemtime(__DIR__ . '/../assets/css/app.css') ?>">
+    <link rel="stylesheet" href="assets/css/workspace.css?v=<?= filemtime(__DIR__ . '/../assets/css/workspace.css') ?>">
 </head>
 <?php
 }
@@ -135,17 +141,24 @@ function layout_start(string $title, string $active = ''): void
     if (is_admin()) $nav['users'] = ['Người dùng', 'users'];
     ?>
 <body>
+<a class="skip-link" href="#main-content">Đi đến nội dung</a>
 <div class="app">
-    <aside class="sidebar">
+    <aside class="sidebar" id="workspace-sidebar" aria-label="Thanh điều hướng">
         <a class="brand" href="<?= e(url('dashboard')) ?>">
             <span class="brand-mark">{ }</span>
             <span class="brand-text"><?= e(config('app_name')) ?><small>Kiểm tra thay đổi & tương thích</small></span>
         </a>
-        <nav class="nav">
+        <div class="nav-label">KHÔNG GIAN LÀM VIỆC</div>
+        <nav class="nav" aria-label="Điều hướng chính" id="workspace-nav">
             <?php foreach ($nav as $key => [$label, $ic]): ?>
-                <a href="<?= e(url($key)) ?>" class="<?= $active === $key ? 'active' : '' ?>"><?= icon($ic) ?><span><?= e($label) ?></span></a>
+                <a href="<?= e(url($key)) ?>" class="<?= $active === $key ? 'active' : '' ?>"<?= $active === $key ? ' aria-current="page"' : '' ?>><?= icon($ic) ?><span><?= e($label) ?></span></a>
             <?php endforeach; ?>
         </nav>
+        <a class="sidebar-guide" href="<?= e(url('rules')) ?>">
+            <?= icon('shield') ?><strong>Hiểu rõ mỗi thay đổi.</strong>
+            <span>Khám phá bộ quy tắc tương thích của API.</span>
+            <span class="guide-link">Xem bộ quy tắc <?= icon('arrow') ?></span>
+        </a>
         <div class="sidebar-user">
             <a class="user-chip" href="<?= e(url('profile')) ?>" title="Hồ sơ cá nhân">
                 <span class="avatar"><?= e(mb_strtoupper(mb_substr($user['full_name'], 0, 1))) ?></span>
@@ -153,11 +166,23 @@ function layout_start(string $title, string $active = ''): void
             </a>
             <form method="post" action="<?= e(url('logout')) ?>">
                 <?= csrf_field() ?>
-                <button class="icon-btn" title="Đăng xuất"><?= icon('logout') ?></button>
+                <button class="icon-btn" title="Đăng xuất" aria-label="Đăng xuất"><?= icon('logout') ?></button>
             </form>
         </div>
     </aside>
-    <main class="main">
+    <main class="main" id="main-content" tabindex="-1">
+        <header class="workspace-topbar">
+            <div class="workspace-location">
+                <button class="menu-toggle" type="button" aria-label="Mở menu điều hướng" aria-controls="workspace-nav" aria-expanded="false" data-nav-toggle><?= icon('menu') ?></button>
+                <span class="workspace-label">Không gian làm việc</span><span class="location-separator">/</span><strong><?= e($title) ?></strong>
+            </div>
+            <form class="workspace-search" method="get" role="search">
+                <input type="hidden" name="page" value="projects">
+                <?= icon('search') ?><input name="q" aria-label="Tìm kiếm dự án" placeholder="Tìm kiếm dự án…" autocomplete="off">
+                <button type="submit" aria-label="Tìm kiếm dự án"><?= icon('arrow') ?></button>
+            </form>
+            <a class="topbar-avatar" href="<?= e(url('profile')) ?>" aria-label="Hồ sơ cá nhân"><?= e(mb_strtoupper(mb_substr($user['full_name'], 0, 1))) ?></a>
+        </header>
         <?php foreach (take_flashes() as [$type, $msg]): ?>
             <div class="alert alert-<?= e($type) ?>"><?= e($msg) ?></div>
         <?php endforeach; ?>
@@ -169,7 +194,7 @@ function layout_end(): void
     ?>
     </main>
 </div>
-<script src="assets/js/app.js?v=1"></script>
+<script src="assets/js/app.js?v=<?= filemtime(__DIR__ . '/../assets/js/app.js') ?>"></script>
 </body>
 </html>
 <?php
@@ -183,14 +208,24 @@ function auth_layout_start(string $title): void
 <div class="auth-wrap">
     <div class="auth-side">
         <div class="brand brand-lg"><span class="brand-mark">{ }</span><span class="brand-text"><?= e(config('app_name')) ?></span></div>
-        <h2>Công cụ kiểm tra thay đổi và tính tương thích của cấu trúc dữ liệu API</h2>
+        <div class="auth-intro"><span class="eyebrow">API SCHEMA WORKSPACE</span>
+        <h2>Tự tin thay đổi API.<br><span>Giữ kết nối vững vàng.</span></h2>
+        <p>Một không gian chung để quản lý cấu trúc, so sánh phiên bản và kiểm tra dữ liệu API của nhóm bạn.</p></div>
+        <div class="schema-preview" aria-label="Ví dụ phát hiện thay đổi kiểu dữ liệu">
+            <div class="preview-title"><span class="preview-dots"><i></i><i></i><i></i></span><span>users.response.json</span><span class="preview-version">v1 → v2</span></div>
+            <div class="preview-code"><span class="code-comment">// Phát hiện thay đổi trước khi phát hành</span><br>{<br>&nbsp;&nbsp;"id": <span class="code-number">1</span>,<br><span class="code-removed">− "age": 25,</span><br><span class="code-added">+ "age": "25",</span><br>&nbsp;&nbsp;"name": <span class="code-string">"Nguyễn Văn An"</span><br>}</div>
+            <div class="preview-result"><?= icon('diff') ?><span>Thay đổi kiểu dữ liệu <strong>integer → string</strong></span><span class="preview-warning">Phá vỡ tương thích</span></div>
+        </div>
         <ul class="auth-points">
             <li>Lưu bản mô tả cấu trúc theo từng phiên bản</li>
             <li>So sánh hai phiên bản, chỉ ra thay đổi phá vỡ tương thích</li>
             <li>Kiểm tra dữ liệu API trả về có đúng mô tả hay không</li>
         </ul>
+        <div class="auth-footnote">Rõ cấu trúc. Hiểu thay đổi. Kiểm soát chất lượng.</div>
     </div>
     <div class="auth-card">
+        <div class="auth-mobile-brand"><span class="brand-mark">{ }</span><strong><?= e(config('app_name')) ?></strong></div>
+        <div class="auth-kicker"><?= icon('shield') ?> KHÔNG GIAN API CỦA BẠN</div>
         <?php foreach (take_flashes() as [$type, $msg]): ?>
             <div class="alert alert-<?= e($type) ?>"><?= e($msg) ?></div>
         <?php endforeach; ?>
@@ -202,6 +237,7 @@ function auth_layout_end(): void
     ?>
     </div>
 </div>
+<script src="assets/js/app.js?v=<?= filemtime(__DIR__ . '/../assets/js/app.js') ?>"></script>
 </body>
 </html>
 <?php

@@ -1,0 +1,349 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="schema" name="Schema">
+    <mxGraphModel dx="1920" dy="1450" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1450" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="users" value="users" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#d9f0e8;swimlaneFillColor=#ffffff;strokeColor=#53988b;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="580" y="520" width="300" height="182" />
+        </mxCell>
+        <mxCell id="users__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__username" value="UQ username VARCHAR(50)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__password_hash" value="password_hash VARCHAR(255)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__full_name" value="full_name VARCHAR(100)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__email" value="email VARCHAR(150)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__role" value="role VARCHAR(20)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="users__created_at" value="created_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="users">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects" value="projects" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1040" y="100" width="300" height="160" />
+        </mxCell>
+        <mxCell id="projects__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects__name" value="name VARCHAR(150)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects__description" value="description TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects__created_by" value="FK created_by INT (nullable)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects__created_at" value="created_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="projects__updated_at" value="updated_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="projects">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members" value="project_members" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="580" y="100" width="300" height="160" />
+        </mxCell>
+        <mxCell id="project_members__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members__project_id" value="FK project_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members__user_id" value="FK user_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members__role" value="role VARCHAR(20)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members__added_at" value="added_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="project_members__uq0" value="UQ (project_id, user_id)" style="text;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=11;fontColor=#765080;" vertex="1" parent="project_members">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints" value="endpoints" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1040" y="520" width="300" height="226" />
+        </mxCell>
+        <mxCell id="endpoints__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__project_id" value="FK project_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__method" value="method VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__path" value="path VARCHAR(255)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__name" value="name VARCHAR(150)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__description" value="description TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__created_by" value="FK created_by INT (nullable)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__created_at" value="created_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="182" width="300" height="22" />
+        </mxCell>
+        <mxCell id="endpoints__uq0" value="UQ (project_id, method, path)" style="text;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=11;fontColor=#765080;" vertex="1" parent="endpoints">
+          <mxGeometry as="geometry" x="0" y="204" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions" value="schema_versions" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1500" y="520" width="300" height="336" />
+        </mxCell>
+        <mxCell id="schema_versions__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__endpoint_id" value="FK endpoint_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__label" value="label VARCHAR(50)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__note" value="note TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__source_format" value="source_format VARCHAR(20)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__request_raw" value="request_raw LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__response_raw" value="response_raw LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__request_tree" value="request_tree LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="182" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__response_tree" value="response_tree LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="204" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__issues" value="issues LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="226" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__issue_count" value="issue_count INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="248" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__created_by" value="FK created_by INT (nullable)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="270" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__created_at" value="created_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="292" width="300" height="22" />
+        </mxCell>
+        <mxCell id="schema_versions__uq0" value="UQ (endpoint_id, label)" style="text;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=11;fontColor=#765080;" vertex="1" parent="schema_versions">
+          <mxGeometry as="geometry" x="0" y="314" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules" value="compat_rules" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="120" y="520" width="300" height="248" />
+        </mxCell>
+        <mxCell id="compat_rules__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__code" value="UQ code VARCHAR(50)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__name" value="name VARCHAR(150)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__description" value="description TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__severity_request" value="severity_request VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__severity_response" value="severity_response VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__advice" value="advice TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__sort_order" value="sort_order INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="182" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__updated_by" value="FK updated_by INT (nullable)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="204" width="300" height="22" />
+        </mxCell>
+        <mxCell id="compat_rules__updated_at" value="updated_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="compat_rules">
+          <mxGeometry as="geometry" x="0" y="226" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs" value="validation_runs" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1040" y="1080" width="300" height="270" />
+        </mxCell>
+        <mxCell id="validation_runs__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__endpoint_id" value="FK endpoint_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__version_id" value="FK version_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__target" value="target VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__title" value="title VARCHAR(200)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__sample_json" value="sample_json LONGTEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__status" value="status VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__error_count" value="error_count INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="182" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__warning_count" value="warning_count INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="204" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__created_by" value="FK created_by INT (nullable)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="226" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_runs__created_at" value="created_at DATETIME" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_runs">
+          <mxGeometry as="geometry" x="0" y="248" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors" value="validation_errors" style="swimlane;html=0;startSize=28;horizontal=1;collapsible=0;rounded=0;fillColor=#f0e5f7;swimlaneFillColor=#ffffff;strokeColor=#9673a6;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1500" y="1080" width="300" height="204" />
+        </mxCell>
+        <mxCell id="validation_errors__id" value="PK id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="28" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__run_id" value="FK run_id INT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="50" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__level" value="level VARCHAR(10)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="72" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__code" value="code VARCHAR(40)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="94" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__path" value="path VARCHAR(500)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="116" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__message" value="message TEXT" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="138" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__expected" value="expected VARCHAR(255)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="160" width="300" height="22" />
+        </mxCell>
+        <mxCell id="validation_errors__actual" value="actual VARCHAR(255)" style="shape=rectangle;rounded=0;html=0;align=left;verticalAlign=middle;spacingLeft=9;fontSize=12;fillColor=none;strokeColor=none;perimeter=rectanglePerimeter;" vertex="1" parent="validation_errors">
+          <mxGeometry as="geometry" x="0" y="182" width="300" height="22" />
+        </mxCell>
+        <mxCell id="fk_projects_created_by" value="created_by" tooltip="projects.created_by → users.id; ON DELETE SET NULL" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERzeroToOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="projects__created_by">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="940" y="559.0" />
+              <mxPoint x="940" y="205.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_project_members_project_id" value="project_id" tooltip="project_members.project_id → projects.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=0;exitY=0.5;exitPerimeter=0;entryX=1;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="projects__id" target="project_members__project_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="970" y="139.0" />
+              <mxPoint x="970" y="161.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_project_members_user_id" value="user_id" tooltip="project_members.user_id → users.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="project_members__user_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="520" y="559.0" />
+              <mxPoint x="520" y="183.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_endpoints_project_id" value="project_id" tooltip="endpoints.project_id → projects.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=1;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="projects__id" target="endpoints__project_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1400" y="139.0" />
+              <mxPoint x="1400" y="581.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_endpoints_created_by" value="created_by" tooltip="endpoints.created_by → users.id; ON DELETE SET NULL" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERzeroToOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="endpoints__created_by">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="960" y="559.0" />
+              <mxPoint x="960" y="691.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_schema_versions_endpoint_id" value="endpoint_id" tooltip="schema_versions.endpoint_id → endpoints.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="endpoints__id" target="schema_versions__endpoint_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1430" y="559.0" />
+              <mxPoint x="1430" y="581.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_schema_versions_created_by" value="created_by" tooltip="schema_versions.created_by → users.id; ON DELETE SET NULL" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=1;entryY=0.5;entryPerimeter=0;startArrow=ERzeroToOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="schema_versions__created_by">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="910" y="559.0" />
+              <mxPoint x="910" y="450" />
+              <mxPoint x="1860" y="450" />
+              <mxPoint x="1860" y="801.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_compat_rules_updated_by" value="updated_by" tooltip="compat_rules.updated_by → users.id; ON DELETE SET NULL" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=0;exitY=0.5;exitPerimeter=0;entryX=1;entryY=0.5;entryPerimeter=0;startArrow=ERzeroToOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="compat_rules__updated_by">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="480" y="559.0" />
+              <mxPoint x="480" y="735.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_validation_runs_endpoint_id" value="endpoint_id" tooltip="validation_runs.endpoint_id → endpoints.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="endpoints__id" target="validation_runs__endpoint_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1000" y="559.0" />
+              <mxPoint x="1000" y="1141.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_validation_runs_version_id" value="version_id" tooltip="validation_runs.version_id → schema_versions.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=0;exitY=0.5;exitPerimeter=0;entryX=1;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="schema_versions__id" target="validation_runs__version_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1380" y="559.0" />
+              <mxPoint x="1380" y="1163.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_validation_runs_created_by" value="created_by" tooltip="validation_runs.created_by → users.id; ON DELETE SET NULL" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERzeroToOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="users__id" target="validation_runs__created_by">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="920" y="559.0" />
+              <mxPoint x="920" y="1317.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_validation_errors_run_id" value="run_id" tooltip="validation_errors.run_id → validation_runs.id; ON DELETE CASCADE" style="edgeStyle=segmentEdgeStyle;rounded=1;arcSize=12;html=0;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;startArrow=ERmandOne;startFill=0;startSize=10;endArrow=ERzeroToMany;endFill=0;endSize=10;strokeColor=#666666;strokeWidth=1;fontSize=11;fontColor=#444444;labelBackgroundColor=#ffffff;jumpStyle=arc;jumpSize=6;" edge="1" parent="1" source="validation_runs__id" target="validation_errors__run_id">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="1430" y="1119.0" />
+              <mxPoint x="1430" y="1141.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend" value="PK: khóa chính · FK: khóa ngoại · UQ: duy nhất&#10;||: 1 · o|: 0..1 · chân chim o&lt;: 0..n&#10;Nguồn: database/schema_mysql.sql&#10;Di chuột lên đường nối để xem ON DELETE." style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=12;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="120" y="1110" width="350" height="110" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

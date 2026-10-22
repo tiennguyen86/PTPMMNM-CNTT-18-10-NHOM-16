@@ -27,20 +27,45 @@ $recentRuns = rows("SELECT r.id, r.title, r.status, r.error_count, r.warning_cou
     WHERE $scope ORDER BY r.id DESC LIMIT 6", $sp);
 
 layout_start('Tổng quan', 'dashboard');
-page_head('Xin chào, ' . e($user['full_name']), [], '<a class="btn btn-primary" href="' . e(url('project_form')) . '">' . icon('plus') . 'Tạo dự án</a>',
-    'Theo dõi thay đổi cấu trúc dữ liệu API và mức độ ảnh hưởng tới các ứng dụng đang sử dụng.');
 ?>
+<div class="dashboard-heading">
+    <div><div class="eyebrow">TỔNG QUAN HỆ THỐNG</div><h1>Xin chào, <?= e($user['full_name']) ?><span class="greeting-dot">.</span></h1><p class="muted">Mọi thay đổi API, trong một tầm nhìn.</p></div>
+    <a class="btn btn-primary" href="<?= e(url('project_form')) ?>"><?= icon('plus') ?>Tạo dự án</a>
+</div>
+<section class="dashboard-hero">
+    <div class="hero-copy">
+        <span class="hero-eyebrow"><?= icon('layers') ?> API SCHEMACHECK</span>
+        <h2>Thay đổi có kiểm soát.<br>API luôn đồng bộ.</h2>
+        <p>Quản lý phiên bản cấu trúc, phát hiện thay đổi ảnh hưởng và kiểm tra dữ liệu trước bước phát hành tiếp theo.</p>
+        <a class="btn hero-button" href="<?= e(url('projects')) ?>">Khám phá dự án <?= icon('arrow') ?></a>
+    </div>
+    <div class="hero-flow" aria-label="Quy trình quản lý API">
+        <div class="flow-node"><span class="flow-icon"><?= icon('layers') ?></span><div><small>BƯỚC 01</small><strong>Lưu cấu trúc</strong></div><span class="flow-file">schema.json</span></div>
+        <div class="flow-connector"></div>
+        <div class="flow-node"><span class="flow-icon"><?= icon('diff') ?></span><div><small>BƯỚC 02</small><strong>So sánh phiên bản</strong></div><span class="flow-file">v1 → v2</span></div>
+        <div class="flow-connector"></div>
+        <div class="flow-node flow-node-last"><span class="flow-icon"><?= icon('shield') ?></span><div><small>BƯỚC 03</small><strong>Kiểm tra dữ liệu</strong></div><?= icon('check') ?></div>
+    </div>
+</section>
+<div class="section-heading"><div><h2>Không gian API của bạn</h2><p class="muted small">Dữ liệu tổng hợp từ các dự án bạn có quyền truy cập.</p></div><span class="section-caption">TỔNG SỐ HIỆN TẠI</span></div>
 <div class="stats">
-    <a class="stat" href="<?= e(url('projects')) ?>"><span class="stat-label">Dự án</span><span class="stat-value"><?= (int)$stats['projects'] ?></span></a>
-    <a class="stat" href="<?= e(url('projects')) ?>"><span class="stat-label">Endpoint</span><span class="stat-value"><?= (int)$stats['endpoints'] ?></span></a>
-    <div class="stat"><span class="stat-label">Phiên bản mô tả</span><span class="stat-value"><?= (int)$stats['versions'] ?></span></div>
-    <a class="stat" href="<?= e(url('runs')) ?>"><span class="stat-label">Lần kiểm tra dữ liệu</span><span class="stat-value"><?= (int)$stats['runs'] ?></span></a>
-    <a class="stat stat-danger" href="<?= e(url('runs', ['status' => 'fail'])) ?>"><span class="stat-label">Lần kiểm tra không đạt</span><span class="stat-value"><?= (int)$stats['failed'] ?></span></a>
+    <?php foreach ([
+        ['projects', 'Dự án', 'folder', 'projects', [], 'Nhóm và tài nguyên'],
+        ['endpoints', 'Endpoint', 'activity', 'projects', [], 'Điểm kết nối API'],
+        ['versions', 'Phiên bản mô tả', 'layers', 'projects', [], 'Lịch sử cấu trúc'],
+        ['runs', 'Lần kiểm tra', 'check', 'runs', [], 'Dữ liệu đã kiểm tra'],
+        ['failed', 'Không đạt', 'diff', 'runs', ['status' => 'fail'], 'Cần xem xét lại'],
+    ] as [$key, $label, $ic, $targetPage, $params, $caption]): ?>
+    <a class="stat<?= $key === 'failed' ? ' stat-danger' : '' ?>" href="<?= e(url($targetPage, $params)) ?>">
+        <div class="stat-top"><span class="stat-label"><?= e($label) ?></span><span class="stat-icon"><?= icon($ic) ?></span></div>
+        <span class="stat-value"><?= (int)$stats[$key] ?></span><span class="stat-caption"><?= e($caption) ?></span>
+    </a>
+    <?php endforeach; ?>
 </div>
 
-<div class="grid-2 gap-lg">
+<div class="grid-2 gap-lg dashboard-activity">
     <section class="card">
-        <div class="card-head"><h2>Phiên bản mô tả mới nhất</h2></div>
+        <div class="card-head"><div class="card-title"><?= icon('layers') ?><h2>Phiên bản mới nhất</h2></div><a class="link" href="<?= e(url('projects')) ?>">Xem dự án →</a></div>
         <?php if (!$recentVersions): ?>
             <div class="card-body muted">Chưa có phiên bản nào.</div>
         <?php else: ?>
@@ -62,7 +87,7 @@ page_head('Xin chào, ' . e($user['full_name']), [], '<a class="btn btn-primary"
     </section>
 
     <section class="card">
-        <div class="card-head"><h2>Lần kiểm tra gần đây</h2><a class="link" href="<?= e(url('runs')) ?>">Xem tất cả →</a></div>
+        <div class="card-head"><div class="card-title"><?= icon('activity') ?><h2>Kiểm tra gần đây</h2></div><a class="link" href="<?= e(url('runs')) ?>">Xem tất cả →</a></div>
         <?php if (!$recentRuns): ?>
             <div class="card-body muted">Chưa có lần kiểm tra nào.</div>
         <?php else: ?>
@@ -84,7 +109,7 @@ page_head('Xin chào, ' . e($user['full_name']), [], '<a class="btn btn-primary"
 </div>
 
 <section class="card">
-    <div class="card-head"><h2>Quy trình sử dụng</h2></div>
+    <div class="card-head"><div><h2>Từ cấu trúc đến chất lượng</h2><p class="muted small">Bốn bước để hiểu và kiểm soát API của bạn.</p></div><?= icon('arrow') ?></div>
     <div class="card-body steps">
         <div class="step"><span class="step-no">1</span><div><strong>Quản lý dự án</strong><p>Tạo dự án, thêm endpoint và thành viên (quyền xem hoặc sửa). Nhập bản mô tả cấu trúc từ tệp JSON.</p></div></div>
         <div class="step"><span class="step-no">2</span><div><strong>Đọc cấu trúc</strong><p>Hệ thống đọc object lồng nhau, mảng, kiểu cơ bản, trường bắt buộc và báo rõ cấu trúc chưa hỗ trợ.</p></div></div>

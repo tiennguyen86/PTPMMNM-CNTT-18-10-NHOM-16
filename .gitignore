@@ -5,3 +5,6 @@
 /database/app.sqlite
 /database/app.sqlite-shm
 /database/app.sqlite-wal
+
+# macOS metadata
+.DS_Store

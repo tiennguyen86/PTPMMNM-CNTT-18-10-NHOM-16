@@ -2,6 +2,71 @@
 (function () {
     'use strict';
 
+    var expandRules = document.querySelector('[data-rules-expand]');
+    if (expandRules) {
+        var ruleEntries = document.querySelectorAll('#rules-list > details');
+        function syncRulesExpansion() {
+            var allOpen = ruleEntries.length > 0 && Array.from(ruleEntries).every(function (entry) { return entry.open; });
+            expandRules.setAttribute('aria-expanded', String(allOpen));
+            expandRules.textContent = allOpen ? 'Thu gọn tất cả −' : 'Mở tất cả +';
+            expandRules.disabled = ruleEntries.length === 0;
+        }
+        expandRules.addEventListener('click', function () {
+            var open = expandRules.getAttribute('aria-expanded') !== 'true';
+            ruleEntries.forEach(function (entry) { entry.open = open; });
+            syncRulesExpansion();
+        });
+        ruleEntries.forEach(function (entry) { entry.addEventListener('toggle', syncRulesExpansion); });
+        syncRulesExpansion();
+    }
+
+    // Menu gọn trên màn hình nhỏ; không che nội dung hay giữ focus.
+    var navToggle = document.querySelector('[data-nav-toggle]');
+    var sidebar = document.getElementById('workspace-sidebar');
+    if (navToggle && sidebar) {
+        function closeNav() {
+            sidebar.classList.remove('nav-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Mở menu điều hướng');
+        }
+        navToggle.addEventListener('click', function () {
+            var open = sidebar.classList.toggle('nav-open');
+            navToggle.setAttribute('aria-expanded', String(open));
+            navToggle.setAttribute('aria-label', open ? 'Đóng menu điều hướng' : 'Mở menu điều hướng');
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('nav-open')) {
+                closeNav();
+                navToggle.focus();
+            }
+        });
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 900) closeNav();
+        });
+    }
+
+    document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var input = document.getElementById(button.dataset.passwordToggle);
+            if (!input) return;
+            var show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            button.textContent = show ? 'Ẩn' : 'Hiện';
+            button.setAttribute('aria-pressed', String(show));
+        });
+    });
+
+    // Bảng rộng cuộn trong vùng riêng, không làm tràn toàn bộ trang.
+    document.querySelectorAll('.table').forEach(function (table) {
+        var wrap = document.createElement('div');
+        wrap.className = 'table-scroll';
+        wrap.tabIndex = 0;
+        wrap.setAttribute('role', 'region');
+        wrap.setAttribute('aria-label', 'Bảng dữ liệu, có thể cuộn ngang');
+        table.parentNode.insertBefore(wrap, table);
+        wrap.appendChild(table);
+    });
+
     // Xác nhận trước khi gửi form nguy hiểm (xóa...)
     document.querySelectorAll('form[data-confirm]').forEach(function (form) {
         form.addEventListener('submit', function (e) {
