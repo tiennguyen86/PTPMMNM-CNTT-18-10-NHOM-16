@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["orderId", "status", "total", "items"],
+  "properties": {
+    "orderId": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["pending", "paid", "shipped"] },
+    "total": { "type": "integer", "minimum": 0 },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["productId", "price"],
+        "properties": {
+          "productId": { "type": "integer" },
+          "price": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

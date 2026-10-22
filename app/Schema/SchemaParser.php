@@ -1,0 +1,277 @@
+<?php
+/**
+ * Đọc bản mô tả cấu trúc dữ liệu (JSON Schema) và chuyển thành cây chuẩn hóa.
+ *
+ * Hỗ trợ: object lồng nhau, mảng, kiểu cơ bản (string, number, integer, boolean, null),
+ * trường bắt buộc (required), nullable, enum/const, format và một số ràng buộc
+ * (minimum, maximum, minLength, maxLength, minItems, maxItems, pattern).
+ *
+ * Các cấu trúc chưa hỗ trợ ($ref, oneOf, anyOf, allOf, tuple, kiểu hợp...) được ghi nhận
+ * thành "vấn đề" (issue) kèm đường dẫn cụ thể, nút tương ứng có type = 'unknown'.
+ */
+class SchemaParser
+{
+    public const TYPES   = ['object', 'array', 'string', 'number', 'integer', 'boolean', 'null'];
+    public const FORMATS = ['date-time', 'date', 'time', 'email', 'uri', 'url', 'uuid', 'ipv4', 'ipv6', 'hostname'];
+    public const CONSTRAINTS = ['minimum', 'maximum', 'minLength', 'maxLength', 'minItems', 'maxItems', 'pattern'];
+
+    private const MAX_DEPTH = 32;
+
+    /** Từ khóa chỉ mang tính chú thích – bỏ qua, không ảnh hưởng cấu trúc. */
+    private const ANNOTATIONS = [
+        '$schema', '$id', '$comment', 'title', 'description', 'default', 'example', 'examples',
+        'deprecated', 'readOnly', 'writeOnly', 'contentMediaType', 'contentEncoding',
+    ];
+
+    private const STRUCTURE = ['type', 'properties', 'required', 'items', 'enum', 'const', 'format', 'nullable', 'additionalProperties'];
+
+    /** Ràng buộc nhận diện được nhưng chưa kiểm tra – cảnh báo rồi bỏ qua. */
+    private const IGNORED_CONSTRAINTS = ['exclusiveMinimum', 'exclusiveMaximum', 'multipleOf', 'uniqueItems', 'minProperties', 'maxProperties'];
+
+    /** Cấu trúc chưa hỗ trợ – cả nhánh bị đánh dấu unknown. */
+    public const UNSUPPORTED = [
+        '$ref'                  => 'tham chiếu $ref',
+        'oneOf'                 => 'kết hợp oneOf',
+        'anyOf'                 => 'kết hợp anyOf',
+        'allOf'                 => 'kết hợp allOf',
+        'not'                   => 'phủ định not',
+        'if'                    => 'điều kiện if/then/else',
+        'then'                  => 'điều kiện if/then/else',
+        'else'                  => 'điều kiện if/then/else',
+        'patternProperties'     => 'trường theo mẫu patternProperties',
+        'dependentSchemas'      => 'phụ thuộc dependentSchemas',
+        'dependentRequired'     => 'phụ thuộc dependentRequired',
+        'dependencies'          => 'phụ thuộc dependencies',
+        'prefixItems'           => 'mảng dạng tuple (prefixItems)',
+        'additionalItems'       => 'mảng dạng tuple (additionalItems)',
+        'contains'              => 'ràng buộc contains',
+        'unevaluatedProperties' => 'unevaluatedProperties',
+        'unevaluatedItems'      => 'unevaluatedItems',
+        'propertyNames'         => 'ràng buộc propertyNames',
+    ];
+
+    private array $issues = [];
+
+    /**
+     * @return array{ok: bool, tree: ?array, issues: array, error: ?string}
+     */
+    public function parse(string $json): array
+    {
+        $this->issues = [];
+        if (trim($json) === '') {
+            return ['ok' => false, 'tree' => null, 'issues' => [], 'error' => 'Nội dung trống.'];
+        }
+        try {
+            $data = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            return ['ok' => false, 'tree' => null, 'issues' => [], 'error' => json_error_vi($e)];
+        }
+        if (!($data instanceof stdClass)) {
+            return ['ok' => false, 'tree' => null, 'issues' => [],
+                'error' => 'Bản mô tả JSON Schema phải là một object (bắt đầu bằng dấu {). Nếu đây là dữ liệu mẫu, hãy chọn định dạng "JSON mẫu".'];
+        }
+        $tree = $this->node($data, '$', 0);
+        return ['ok' => true, 'tree' => $tree, 'issues' => $this->issues, 'error' => null];
+    }
+
+    private function issue(string $level, string $path, string $message): void
+    {
+        $this->issues[] = ['level' => $level, 'path' => $path, 'message' => $message];
+    }
+
+    private function unknown(string $reason): array
+    {
+        return ['type' => 'unknown', 'nullable' => false, 'reason' => $reason];
+    }
+
+    private function node($s, string $path, int $depth): array
+    {
+        if ($depth > self::MAX_DEPTH) {
+            $this->issue('error', $path, 'Cấu trúc lồng nhau quá sâu (hơn ' . self::MAX_DEPTH . ' cấp).');
+            return $this->unknown('lồng quá sâu');
+        }
+        if ($s === true) {
+            return ['type' => 'any', 'nullable' => true];
+        }
+        if ($s === false) {
+            $this->issue('error', $path, 'Cấu trúc chưa được hỗ trợ: schema `false` (không chấp nhận giá trị nào).');
+            return $this->unknown('schema false');
+        }
+        if (!($s instanceof stdClass)) {
+            $this->issue('error', $path, 'Mô tả của trường phải là một object JSON, nhận được ' . SchemaValidator::jsonType($s) . '.');
+            return $this->unknown('mô tả không hợp lệ');
+        }
+
+        $p = get_object_vars($s);
+        $keys = array_map('strval', array_keys($p));
+
+        // 1. Cấu trúc chưa hỗ trợ
+        $found = array_values(array_intersect($keys, array_keys(self::UNSUPPORTED)));
+        if ($found) {
+            foreach ($found as $kw) {
+                $this->issue('error', $path, sprintf(
+                    'Cấu trúc chưa được hỗ trợ: %s (từ khóa `%s`). Nhánh này sẽ bị bỏ qua khi so sánh và kiểm tra dữ liệu.',
+                    self::UNSUPPORTED[$kw], $kw
+                ));
+            }
+            return $this->unknown(implode(', ', $found));
+        }
+
+        // 2. Kiểu dữ liệu
+        $type = $p['type'] ?? null;
+        $nullable = !empty($p['nullable']); // cú pháp OpenAPI 3.0
+        if (is_array($type)) {
+            $nonNull = array_values(array_filter($type, fn($t) => $t !== 'null'));
+            $nullable = $nullable || count($nonNull) < count($type);
+            if (count($nonNull) === 0) {
+                $type = 'null';
+            } elseif (count($nonNull) === 1) {
+                $type = $nonNull[0];
+            } else {
+                $this->issue('error', $path, 'Cấu trúc chưa được hỗ trợ: kiểu hợp nhiều kiểu (' . implode(' | ', array_map('strval', $type)) . '). Chỉ hỗ trợ một kiểu, có thể kèm "null".');
+                return $this->unknown('kiểu hợp ' . implode('|', array_map('strval', $type)));
+            }
+        }
+        if ($type === null) {
+            if (isset($p['properties']) || isset($p['required'])) {
+                $type = 'object';
+                $this->issue('info', $path, 'Không khai báo `type` nhưng có `properties` – hiểu là object.');
+            } elseif (isset($p['items'])) {
+                $type = 'array';
+                $this->issue('info', $path, 'Không khai báo `type` nhưng có `items` – hiểu là array.');
+            } else {
+                $type = 'any';
+                $this->issue('warning', $path, 'Không khai báo kiểu dữ liệu – mọi giá trị đều được chấp nhận.');
+            }
+        }
+        if ($type !== 'any' && (!is_string($type) || !in_array($type, self::TYPES, true))) {
+            $this->issue('error', $path, 'Kiểu dữ liệu không hợp lệ hoặc chưa hỗ trợ: ' . json_encode($type, JSON_UNESCAPED_UNICODE) . '.');
+            return $this->unknown('kiểu ' . (is_string($type) ? $type : 'không hợp lệ'));
+        }
+
+        $node = ['type' => $type, 'nullable' => $nullable];
+        if (isset($p['description']) && is_string($p['description']) && $p['description'] !== '') {
+            $node['description'] = $p['description'];
+        }
+
+        // 3. enum / const
+        $enum = null;
+        if (array_key_exists('const', $p)) $enum = [$p['const']];
+        if (array_key_exists('enum', $p)) {
+            if (is_array($p['enum']) && $p['enum']) {
+                $enum = $p['enum'];
+            } else {
+                $this->issue('warning', $path, '`enum` phải là mảng có ít nhất một giá trị – đã bỏ qua.');
+            }
+        }
+        if ($enum !== null) {
+            $scalar = array_values(array_filter($enum, fn($v) => is_scalar($v) || $v === null));
+            if (count($scalar) < count($enum)) {
+                $this->issue('warning', $path, 'Giá trị enum dạng object/mảng chưa được hỗ trợ – đã bỏ qua các giá trị đó.');
+            }
+            if ($scalar) $node['enum'] = $scalar;
+        }
+
+        // 4. format
+        if (isset($p['format'])) {
+            if (is_string($p['format'])) {
+                $node['format'] = $p['format'];
+                if (!in_array($p['format'], self::FORMATS, true)) {
+                    $this->issue('warning', $path, 'Định dạng `' . $p['format'] . '` chưa được hỗ trợ kiểm tra – chỉ lưu để so sánh.');
+                }
+            } else {
+                $this->issue('warning', $path, '`format` phải là chuỗi – đã bỏ qua.');
+            }
+        }
+
+        // 5. Ràng buộc
+        foreach (self::CONSTRAINTS as $c) {
+            if (!array_key_exists($c, $p)) continue;
+            $v = $p[$c];
+            if ($c === 'pattern') {
+                if (!is_string($v) || @preg_match(SchemaValidator::regex($v), '') === false) {
+                    $this->issue('warning', $path, '`pattern` không phải biểu thức chính quy hợp lệ – đã bỏ qua.');
+                    continue;
+                }
+            } elseif (!is_int($v) && !is_float($v)) {
+                $this->issue('warning', $path, "`$c` phải là số – đã bỏ qua.");
+                continue;
+            }
+            $node['constraints'][$c] = $v;
+        }
+        foreach (self::IGNORED_CONSTRAINTS as $c) {
+            if (array_key_exists($c, $p)) {
+                $this->issue('warning', $path, "Ràng buộc `$c` chưa được hỗ trợ – đã bỏ qua.");
+            }
+        }
+
+        // 6. Object
+        if ($type === 'object') {
+            $node['properties'] = [];
+            $props = $p['properties'] ?? new stdClass();
+            if (!($props instanceof stdClass)) {
+                $this->issue('error', $path, '`properties` phải là một object.');
+                $props = new stdClass();
+            }
+            foreach (get_object_vars($props) as $name => $child) {
+                $name = (string)$name;
+                $node['properties'][$name] = $this->node($child, SchemaTree::childPath($path, $name), $depth + 1);
+            }
+
+            $node['required'] = [];
+            $req = $p['required'] ?? [];
+            if (!is_array($req)) {
+                $this->issue('warning', $path, '`required` phải là mảng tên trường – đã bỏ qua.');
+                $req = [];
+            }
+            foreach ($req as $r) {
+                if (!is_string($r)) {
+                    $this->issue('warning', $path, 'Tên trường trong `required` phải là chuỗi – đã bỏ qua ' . json_encode($r) . '.');
+                } elseif (!array_key_exists($r, $node['properties'])) {
+                    $this->issue('warning', $path, "Trường bắt buộc `$r` chưa được khai báo trong `properties`.");
+                } elseif (!in_array($r, $node['required'], true)) {
+                    $node['required'][] = $r;
+                }
+            }
+
+            if (array_key_exists('additionalProperties', $p)) {
+                $ap = $p['additionalProperties'];
+                if (is_bool($ap)) {
+                    $node['additionalProperties'] = $ap;
+                } else {
+                    $this->issue('error', $path, 'Cấu trúc chưa được hỗ trợ: `additionalProperties` dạng schema (object kiểu từ điển/map). Các trường phát sinh sẽ không được kiểm tra kiểu.');
+                }
+            }
+        } elseif (isset($p['properties']) || isset($p['required'])) {
+            $this->issue('warning', $path, "`properties`/`required` chỉ áp dụng cho object nhưng trường này có kiểu $type – đã bỏ qua.");
+        }
+
+        // 7. Array
+        if ($type === 'array') {
+            if (!array_key_exists('items', $p)) {
+                $this->issue('warning', $path, 'Mảng không khai báo `items` – phần tử có thể là bất kỳ kiểu nào.');
+                $node['items'] = ['type' => 'any', 'nullable' => true];
+            } elseif (is_array($p['items'])) {
+                $this->issue('error', $path . '[]', 'Cấu trúc chưa được hỗ trợ: mảng dạng tuple (`items` là danh sách schema).');
+                $node['items'] = $this->unknown('mảng tuple');
+            } else {
+                $node['items'] = $this->node($p['items'], $path . '[]', $depth + 1);
+            }
+        } elseif (isset($p['items'])) {
+            $this->issue('warning', $path, "`items` chỉ áp dụng cho array nhưng trường này có kiểu $type – đã bỏ qua.");
+        }
+
+        // 8. Từ khóa lạ
+        if (isset($p['$defs']) || isset($p['definitions'])) {
+            $this->issue('warning', $path, 'Bỏ qua phần định nghĩa dùng chung (`$defs`/`definitions`) vì chưa hỗ trợ `$ref`.');
+        }
+        $known = array_merge(self::ANNOTATIONS, self::STRUCTURE, self::CONSTRAINTS, self::IGNORED_CONSTRAINTS, ['$defs', 'definitions']);
+        foreach ($keys as $k) {
+            if (!in_array($k, $known, true) && !str_starts_with($k, 'x-')) {
+                $this->issue('warning', $path, "Từ khóa `$k` không được nhận diện – đã bỏ qua.");
+            }
+        }
+
+        return $node;
+    }
+}

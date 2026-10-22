@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "username": "nguyenvana",
+  "email": null,
+  "phoneNumber": "0901234567",
+  "age": "25",
+  "status": "active",
+  "address": {
+    "street": "12 Lê Lợi",
+    "city": "Hà Nội",
+    "district": "Hoàn Kiếm"
+  },
+  "roles": ["admin", "editor"],
+  "avatarUrl": "https://example.com/avatar/1.png",
+  "createdAt": "2026-10-01T08:30:00+07:00"
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["data", "total"],
+  "x-internal-note": "Từ khóa mở rộng x-* được bỏ qua",
+  "$defs": {
+    "Product": {
+      "type": "object",
+      "properties": { "id": { "type": "integer" }, "name": { "type": "string" } }
+    }
+  },
+  "properties": {
+    "data": { "type": "array", "items": { "$ref": "#/$defs/Product" } },
+    "total": { "type": "integer", "minimum": 0 },
+    "price": { "oneOf": [{ "type": "integer" }, { "type": "string" }] },
+    "tags": { "type": ["string", "integer"] },
+    "dimensions": { "type": "array", "items": [{ "type": "number" }, { "type": "number" }] },
+    "meta": { "type": "object", "additionalProperties": { "type": "string" } },
+    "sku": { "type": "string", "pattern": "^[A-Z]{3}-\\d{4}$" },
+    "rating": { "type": "number", "exclusiveMaximum": 5 },
+    "discountPercent": { "type": "number", "maximum": 100, "unit": "%" }
+  }
+}

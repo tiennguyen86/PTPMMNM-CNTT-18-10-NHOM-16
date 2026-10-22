@@ -1,0 +1,40 @@
+<?php
+defined('APP') or exit;
+
+if (current_user()) redirect('dashboard');
+
+$username = '';
+$error = null;
+if (is_post()) {
+    $username = post('username');
+    $user = row('SELECT * FROM users WHERE username = ?', [$username]);
+    if ($user && password_verify(post('password'), $user['password_hash'])) {
+        login_user($user);
+        flash('success', 'Xin chào ' . $user['full_name'] . '!');
+        redirect('dashboard');
+    }
+    $error = 'Sai tên đăng nhập hoặc mật khẩu.';
+}
+
+auth_layout_start('Đăng nhập');
+?>
+<h1>Đăng nhập</h1>
+<p class="muted">Dành cho người phụ trách API và thành viên nhóm phát triển.</p>
+<?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
+<form method="post" class="stack">
+    <?= csrf_field() ?>
+    <label class="field"><span>Tên đăng nhập</span><input class="input" name="username" value="<?= e($username) ?>" required autofocus></label>
+    <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required></label>
+    <button class="btn btn-primary btn-block">Đăng nhập</button>
+</form>
+<p class="muted center">Chưa có tài khoản? <a href="<?= e(url('register')) ?>">Đăng ký</a></p>
+<div class="demo-accounts">
+    <strong>Tài khoản dùng thử</strong>
+    <table>
+        <tr><td><code>admin</code> / <code>admin123</code></td><td>Quản trị hệ thống</td></tr>
+        <tr><td><code>phutrach</code> / <code>123456</code></td><td>Người phụ trách API</td></tr>
+        <tr><td><code>dev1</code> / <code>123456</code></td><td>Thành viên – được sửa</td></tr>
+        <tr><td><code>tester</code> / <code>123456</code></td><td>Thành viên – chỉ xem</td></tr>
+    </table>
+</div>
+<?php auth_layout_end();

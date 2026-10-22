@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Thông tin người dùng – v2",
+  "type": "object",
+  "required": ["id", "username", "email", "phoneNumber", "age", "status", "address", "createdAt"],
+  "properties": {
+    "id": { "type": "integer", "description": "Mã định danh người dùng" },
+    "username": { "type": "string", "minLength": 3, "maxLength": 100 },
+    "email": { "type": ["string", "null"], "format": "email" },
+    "phoneNumber": { "type": "string", "description": "Số điện thoại" },
+    "age": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "inactive", "banned"] },
+    "address": {
+      "type": "object",
+      "required": ["city"],
+      "properties": {
+        "street": { "type": "string" },
+        "city": { "type": "string" },
+        "district": { "type": "string" }
+      }
+    },
+    "roles": { "type": "array", "items": { "type": "string" } },
+    "avatarUrl": { "type": "string", "format": "uri" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

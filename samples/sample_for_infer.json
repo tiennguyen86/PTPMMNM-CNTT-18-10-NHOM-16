@@ -1,0 +1,15 @@
+{
+  "id": 10,
+  "title": "Khuyến mãi cuối tuần",
+  "read": false,
+  "score": 4.5,
+  "sentAt": "2026-10-20T10:00:00Z",
+  "tags": ["sale", "new"],
+  "sender": { "id": 2, "name": "Hệ thống" },
+  "recipients": [
+    { "id": 5, "name": "An", "email": "an@example.com" },
+    { "id": 6, "name": "Bình" }
+  ],
+  "attachments": [],
+  "extra": null
+}

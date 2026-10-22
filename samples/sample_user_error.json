@@ -1,0 +1,14 @@
+{
+  "id": "1",
+  "username": "ab",
+  "email": "khong-phai-email",
+  "phone": "0901234567",
+  "age": 25,
+  "status": "deleted",
+  "address": {
+    "street": "12 Lê Lợi",
+    "zip": "100000"
+  },
+  "roles": ["admin", 3],
+  "createdAt": "21/10/2026"
+}
