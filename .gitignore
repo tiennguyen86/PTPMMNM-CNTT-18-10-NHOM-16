@@ -1,2 +1,7 @@
 .env
 
+
+# Local SQLite database
+/database/app.sqlite
+/database/app.sqlite-shm
+/database/app.sqlite-wal
