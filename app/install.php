@@ -117,6 +117,20 @@ function schema_statements(string $driver): array
             FOREIGN KEY (run_id) REFERENCES validation_runs(id) ON DELETE CASCADE
         )$tail",
 
+        "CREATE TABLE login_attempts (
+            id $pk,
+            username VARCHAR(100) NOT NULL,
+            ip VARCHAR(45) NOT NULL,
+            success TINYINT NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL
+        )$tail",
+
+        "CREATE TABLE schema_migrations (
+            id $pk,
+            name VARCHAR(100) NOT NULL UNIQUE,
+            applied_at DATETIME NOT NULL
+        )$tail",
+
         "CREATE INDEX idx_members_user ON project_members (user_id)",
         "CREATE INDEX idx_endpoints_project ON endpoints (project_id)",
         "CREATE INDEX idx_versions_endpoint ON schema_versions (endpoint_id)",
@@ -124,20 +138,63 @@ function schema_statements(string $driver): array
         "CREATE INDEX idx_runs_created ON validation_runs (created_at)",
         "CREATE INDEX idx_errors_run ON validation_errors (run_id)",
         "CREATE INDEX idx_errors_code ON validation_errors (code)",
+        "CREATE INDEX idx_login_attempts_created ON login_attempts (created_at)",
+        "CREATE INDEX idx_login_attempts_user ON login_attempts (username)",
     ];
+}
+
+function table_exists(PDO $pdo, string $driver, string $table): bool
+{
+    if ($driver === 'mysql') {
+        $stmt = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?');
+        $stmt->execute([$table]);
+        return (bool)$stmt->fetchColumn();
+    }
+    $stmt = $pdo->prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?");
+    $stmt->execute([$table]);
+    return (bool)$stmt->fetchColumn();
 }
 
 function install_if_needed(PDO $pdo, string $driver): void
 {
-    $exists = $driver === 'mysql'
-        ? $pdo->query("SHOW TABLES LIKE 'users'")->fetchColumn()
-        : $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")->fetchColumn();
-    if ($exists) return;
-
-    foreach (schema_statements($driver) as $sql) {
-        $pdo->exec($sql);
+    if (!table_exists($pdo, $driver, 'users')) {
+        foreach (schema_statements($driver) as $sql) {
+            $pdo->exec($sql);
+        }
+        seed_database($pdo);
+        return;
     }
-    seed_database($pdo);
+
+    // Migration nhẹ cho CSDL đã có từ bản trước
+    migrate_existing($pdo, $driver);
+}
+
+/** Áp dụng các thay đổi schema bổ sung (idempotent). */
+function migrate_existing(PDO $pdo, string $driver): void
+{
+    $mysql = $driver === 'mysql';
+    $pk = $mysql ? 'INT AUTO_INCREMENT PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    $tail = $mysql ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' : '';
+
+    if (!table_exists($pdo, $driver, 'login_attempts')) {
+        $pdo->exec("CREATE TABLE login_attempts (
+            id $pk,
+            username VARCHAR(100) NOT NULL,
+            ip VARCHAR(45) NOT NULL,
+            success TINYINT NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL
+        )$tail");
+        $pdo->exec('CREATE INDEX idx_login_attempts_created ON login_attempts (created_at)');
+        $pdo->exec('CREATE INDEX idx_login_attempts_user ON login_attempts (username)');
+    }
+
+    if (!table_exists($pdo, $driver, 'schema_migrations')) {
+        $pdo->exec("CREATE TABLE schema_migrations (
+            id $pk,
+            name VARCHAR(100) NOT NULL UNIQUE,
+            applied_at DATETIME NOT NULL
+        )$tail");
+    }
 }
 
 /** Dữ liệu mẫu để chạy thử ngay. */

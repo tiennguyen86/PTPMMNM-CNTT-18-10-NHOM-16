@@ -30,7 +30,10 @@ page_head('So sánh phiên bản', [
     $ep['project_name'] => url('project', ['id' => $ep['project_id']]),
     $ep['method'] . ' ' . $ep['path'] => url('endpoint', ['id' => $endpointId]),
     'So sánh' => null,
-], $result ? '<button type="button" class="btn btn-ghost" data-print>' . icon('print') . 'In báo cáo</button>' : '',
+], $result
+    ? '<a class="btn btn-ghost" href="' . e(url('compare_export', ['endpoint_id' => $endpointId, 'from' => $fromId, 'to' => $toId])) . '">' . icon('download') . 'Xuất Markdown</a>'
+      . '<button type="button" class="btn btn-ghost" data-print>' . icon('print') . 'In báo cáo</button>'
+    : '',
     'Phân loại từng thay đổi theo <a href="' . e(url('rules')) . '">bộ quy tắc tương thích đã công bố</a>.');
 ?>
 <?php if (count($versions) < 2): ?>
@@ -65,14 +68,14 @@ page_head('So sánh phiên bản', [
         'none'     => ['Không có thay đổi', 'Hai phiên bản có cấu trúc giống nhau.'],
     ][$s['verdict']];
     $bumpText = ['major' => 'MAJOR (phiên bản chính)', 'minor' => 'MINOR (phiên bản phụ)', 'patch' => 'PATCH (bản vá)', 'none' => 'Không cần'][$s['bump']];
-    $suggest = next_version_label($old['label'], $s['bump']);
+    $suggest = suggest_version_after_compare($old['label'], $new['label'], $s['bump']);
     ?>
     <section class="verdict verdict-<?= e($s['verdict']) ?>">
         <div class="verdict-main">
             <div class="verdict-label"><?= e($old['label']) ?> → <?= e($new['label']) ?></div>
             <h2><?= e($verdictText[0]) ?></h2>
             <p><?= e($verdictText[1]) ?></p>
-            <p class="small">Gợi ý tăng phiên bản theo Semantic Versioning: <strong><?= e($bumpText) ?></strong><?= $suggest && $s['bump'] !== 'none' ? ' – ví dụ ' . e($old['label']) . ' → <strong>' . e($suggest) . '</strong>' : '' ?>.</p>
+            <p class="small">Gợi ý tăng phiên bản theo Semantic Versioning: <strong><?= e($bumpText) ?></strong><?= $suggest && $s['bump'] !== 'none' ? ' – từ bản mới, ví dụ ' . e($new['label']) . ' → <strong>' . e($suggest) . '</strong>' : '' ?>.</p>
         </div>
         <div class="verdict-counts">
             <div class="vc vc-breaking"><strong><?= $s['counts']['breaking'] ?></strong><span>Phá vỡ</span></div>

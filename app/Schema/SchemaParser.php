@@ -2,12 +2,11 @@
 /**
  * Đọc bản mô tả cấu trúc dữ liệu (JSON Schema) và chuyển thành cây chuẩn hóa.
  *
- * Hỗ trợ: object lồng nhau, mảng, kiểu cơ bản (string, number, integer, boolean, null),
- * trường bắt buộc (required), nullable, enum/const, format và một số ràng buộc
- * (minimum, maximum, minLength, maxLength, minItems, maxItems, pattern).
+ * Hỗ trợ: object lồng nhau, mảng, kiểu cơ bản, required, nullable, enum/const, format,
+ * ràng buộc, $ref nội bộ (#/$defs/..., #/definitions/...), allOf (gộp schema).
  *
- * Các cấu trúc chưa hỗ trợ ($ref, oneOf, anyOf, allOf, tuple, kiểu hợp...) được ghi nhận
- * thành "vấn đề" (issue) kèm đường dẫn cụ thể, nút tương ứng có type = 'unknown'.
+ * Các cấu trúc chưa hỗ trợ (oneOf/anyOf đầy đủ, $ref ngoài file, tuple…) được ghi nhận
+ * thành "vấn đề" (issue); nhánh tương ứng có type = 'unknown' khi không giải được.
  */
 class SchemaParser
 {
@@ -16,6 +15,7 @@ class SchemaParser
     public const CONSTRAINTS = ['minimum', 'maximum', 'minLength', 'maxLength', 'minItems', 'maxItems', 'pattern'];
 
     private const MAX_DEPTH = 32;
+    private const MAX_REF_DEPTH = 16;
 
     /** Từ khóa chỉ mang tính chú thích – bỏ qua, không ảnh hưởng cấu trúc. */
     private const ANNOTATIONS = [
@@ -23,34 +23,35 @@ class SchemaParser
         'deprecated', 'readOnly', 'writeOnly', 'contentMediaType', 'contentEncoding',
     ];
 
-    private const STRUCTURE = ['type', 'properties', 'required', 'items', 'enum', 'const', 'format', 'nullable', 'additionalProperties'];
+    private const STRUCTURE = [
+        'type', 'properties', 'required', 'items', 'enum', 'const', 'format', 'nullable',
+        'additionalProperties', '$ref', 'allOf', 'oneOf', 'anyOf',
+    ];
 
     /** Ràng buộc nhận diện được nhưng chưa kiểm tra – cảnh báo rồi bỏ qua. */
     private const IGNORED_CONSTRAINTS = ['exclusiveMinimum', 'exclusiveMaximum', 'multipleOf', 'uniqueItems', 'minProperties', 'maxProperties'];
 
-    /** Cấu trúc chưa hỗ trợ – cả nhánh bị đánh dấu unknown. */
+    /** Cấu trúc chưa hỗ trợ – cả nhánh bị đánh dấu unknown (trừ khi đã xử lý riêng). */
     public const UNSUPPORTED = [
-        '$ref'                  => 'tham chiếu $ref',
-        'oneOf'                 => 'kết hợp oneOf',
-        'anyOf'                 => 'kết hợp anyOf',
-        'allOf'                 => 'kết hợp allOf',
-        'not'                   => 'phủ định not',
-        'if'                    => 'điều kiện if/then/else',
-        'then'                  => 'điều kiện if/then/else',
-        'else'                  => 'điều kiện if/then/else',
-        'patternProperties'     => 'trường theo mẫu patternProperties',
-        'dependentSchemas'      => 'phụ thuộc dependentSchemas',
-        'dependentRequired'     => 'phụ thuộc dependentRequired',
-        'dependencies'          => 'phụ thuộc dependencies',
-        'prefixItems'           => 'mảng dạng tuple (prefixItems)',
-        'additionalItems'       => 'mảng dạng tuple (additionalItems)',
-        'contains'              => 'ràng buộc contains',
-        'unevaluatedProperties' => 'unevaluatedProperties',
-        'unevaluatedItems'      => 'unevaluatedItems',
-        'propertyNames'         => 'ràng buộc propertyNames',
+        'not'                    => 'phủ định not',
+        'if'                     => 'điều kiện if/then/else',
+        'then'                   => 'điều kiện if/then/else',
+        'else'                   => 'điều kiện if/then/else',
+        'patternProperties'      => 'trường theo mẫu patternProperties',
+        'dependentSchemas'       => 'phụ thuộc dependentSchemas',
+        'dependentRequired'      => 'phụ thuộc dependentRequired',
+        'dependencies'           => 'phụ thuộc dependencies',
+        'prefixItems'            => 'mảng dạng tuple (prefixItems)',
+        'additionalItems'        => 'mảng dạng tuple (additionalItems)',
+        'contains'               => 'ràng buộc contains',
+        'unevaluatedProperties'  => 'unevaluatedProperties',
+        'unevaluatedItems'       => 'unevaluatedItems',
+        'propertyNames'          => 'ràng buộc propertyNames',
     ];
 
     private array $issues = [];
+    private ?stdClass $root = null;
+    private array $refStack = [];
 
     /**
      * @return array{ok: bool, tree: ?array, issues: array, error: ?string}
@@ -58,6 +59,8 @@ class SchemaParser
     public function parse(string $json): array
     {
         $this->issues = [];
+        $this->root = null;
+        $this->refStack = [];
         if (trim($json) === '') {
             return ['ok' => false, 'tree' => null, 'issues' => [], 'error' => 'Nội dung trống.'];
         }
@@ -70,6 +73,7 @@ class SchemaParser
             return ['ok' => false, 'tree' => null, 'issues' => [],
                 'error' => 'Bản mô tả JSON Schema phải là một object (bắt đầu bằng dấu {). Nếu đây là dữ liệu mẫu, hãy chọn định dạng "JSON mẫu".'];
         }
+        $this->root = $data;
         $tree = $this->node($data, '$', 0);
         return ['ok' => true, 'tree' => $tree, 'issues' => $this->issues, 'error' => null];
     }
@@ -105,7 +109,31 @@ class SchemaParser
         $p = get_object_vars($s);
         $keys = array_map('strval', array_keys($p));
 
-        // 1. Cấu trúc chưa hỗ trợ
+        // 0. $ref nội bộ
+        if (isset($p['$ref'])) {
+            return $this->resolveRef($p['$ref'], $path, $depth, $p);
+        }
+
+        // 0b. allOf – gộp các schema
+        if (isset($p['allOf'])) {
+            $merged = $this->mergeAllOf($p, $path);
+            if ($merged === null) {
+                return $this->unknown('allOf');
+            }
+            return $this->node($merged, $path, $depth);
+        }
+
+        // 0c. oneOf / anyOf – chưa validate đầy đủ; ghi nhận và bỏ qua nhánh
+        if (isset($p['oneOf']) || isset($p['anyOf'])) {
+            $kw = isset($p['oneOf']) ? 'oneOf' : 'anyOf';
+            $this->issue('error', $path, sprintf(
+                'Cấu trúc chưa được hỗ trợ đầy đủ: kết hợp %s. Nhánh này sẽ bị bỏ qua khi so sánh và kiểm tra dữ liệu.',
+                $kw
+            ));
+            return $this->unknown($kw);
+        }
+
+        // 1. Cấu trúc chưa hỗ trợ khác
         $found = array_values(array_intersect($keys, array_keys(self::UNSUPPORTED)));
         if ($found) {
             foreach ($found as $kw) {
@@ -189,8 +217,8 @@ class SchemaParser
             if (!array_key_exists($c, $p)) continue;
             $v = $p[$c];
             if ($c === 'pattern') {
-                if (!is_string($v) || @preg_match(SchemaValidator::regex($v), '') === false) {
-                    $this->issue('warning', $path, '`pattern` không phải biểu thức chính quy hợp lệ – đã bỏ qua.');
+                if (!is_string($v) || !SchemaValidator::isSafePattern($v)) {
+                    $this->issue('warning', $path, '`pattern` không hợp lệ hoặc không an toàn (ReDoS) – đã bỏ qua.');
                     continue;
                 }
             } elseif (!is_int($v) && !is_float($v)) {
@@ -262,10 +290,7 @@ class SchemaParser
         }
 
         // 8. Từ khóa lạ
-        if (isset($p['$defs']) || isset($p['definitions'])) {
-            $this->issue('warning', $path, 'Bỏ qua phần định nghĩa dùng chung (`$defs`/`definitions`) vì chưa hỗ trợ `$ref`.');
-        }
-        $known = array_merge(self::ANNOTATIONS, self::STRUCTURE, self::CONSTRAINTS, self::IGNORED_CONSTRAINTS, ['$defs', 'definitions']);
+        $known = array_merge(self::ANNOTATIONS, self::STRUCTURE, self::CONSTRAINTS, self::IGNORED_CONSTRAINTS, ['$defs', 'definitions', 'components']);
         foreach ($keys as $k) {
             if (!in_array($k, $known, true) && !str_starts_with($k, 'x-')) {
                 $this->issue('warning', $path, "Từ khóa `$k` không được nhận diện – đã bỏ qua.");
@@ -273,5 +298,147 @@ class SchemaParser
         }
 
         return $node;
+    }
+
+    /**
+     * Giải $ref nội bộ dạng #/$defs/Name hoặc #/definitions/Name hoặc #/components/schemas/Name.
+     * Các khóa khác trên cùng object (sibling) được gộp nhẹ sau khi resolve.
+     */
+    private function resolveRef($ref, string $path, int $depth, array $siblings): array
+    {
+        if (!is_string($ref) || $ref === '') {
+            $this->issue('error', $path, '`$ref` phải là chuỗi.');
+            return $this->unknown('$ref');
+        }
+        if (!str_starts_with($ref, '#/')) {
+            $this->issue('error', $path, 'Chỉ hỗ trợ `$ref` nội bộ bắt đầu bằng `#/` (ví dụ `#/$defs/User`). Nhận được: ' . $ref);
+            return $this->unknown('$ref ngoài');
+        }
+        if (count($this->refStack) >= self::MAX_REF_DEPTH) {
+            $this->issue('error', $path, 'Chuỗi `$ref` quá sâu hoặc vòng lặp.');
+            return $this->unknown('$ref vòng');
+        }
+        if (in_array($ref, $this->refStack, true)) {
+            $this->issue('error', $path, 'Phát hiện `$ref` vòng: ' . $ref);
+            return $this->unknown('$ref vòng');
+        }
+
+        $target = $this->lookupPointer($ref);
+        if ($target === null) {
+            $this->issue('error', $path, 'Không tìm thấy đích `$ref`: ' . $ref);
+            return $this->unknown('$ref thiếu');
+        }
+
+        $this->refStack[] = $ref;
+        $this->issue('info', $path, 'Đã giải `$ref` → ' . $ref);
+        $resolved = $this->node($target, $path, $depth + 1);
+        array_pop($this->refStack);
+
+        // Sibling keywords (OpenAPI hay dùng): gộp description/nullable đơn giản
+        unset($siblings['$ref']);
+        if ($siblings) {
+            if (isset($siblings['description']) && is_string($siblings['description']) && $siblings['description'] !== '') {
+                $resolved['description'] = $siblings['description'];
+            }
+            if (!empty($siblings['nullable'])) {
+                $resolved['nullable'] = true;
+            }
+        }
+        return $resolved;
+    }
+
+    private function lookupPointer(string $ref)
+    {
+        if ($this->root === null) return null;
+        $parts = explode('/', substr($ref, 2)); // bỏ "#/"
+        $cur = $this->root;
+        foreach ($parts as $part) {
+            $part = str_replace(['~1', '~0'], ['/', '~'], $part);
+            if ($cur instanceof stdClass) {
+                $vars = get_object_vars($cur);
+                if (!array_key_exists($part, $vars)) return null;
+                $cur = $vars[$part];
+            } elseif (is_array($cur) && array_key_exists($part, $cur)) {
+                $cur = $cur[$part];
+            } else {
+                return null;
+            }
+        }
+        return $cur;
+    }
+
+    /**
+     * Gộp allOf thành một schema object; trả về null nếu không gộp được.
+     */
+    private function mergeAllOf(array $p, string $path): ?stdClass
+    {
+        $parts = $p['allOf'];
+        if (!is_array($parts) || !$parts) {
+            $this->issue('error', $path, '`allOf` phải là mảng schema không rỗng.');
+            return null;
+        }
+
+        $merged = new stdClass();
+        foreach ($p as $k => $v) {
+            if ($k === 'allOf') continue;
+            $merged->$k = $v;
+        }
+
+        foreach ($parts as $i => $part) {
+            if ($part === true) continue;
+            if ($part === false) {
+                $this->issue('error', $path, '`allOf` chứa schema `false` – không thể gộp.');
+                return null;
+            }
+            if (!($part instanceof stdClass)) {
+                $this->issue('error', $path . '/allOf/' . $i, 'Phần tử allOf phải là object schema.');
+                return null;
+            }
+            // Resolve $ref trong phần tử allOf trước khi gộp
+            $piece = $part;
+            if (isset($part->{'$ref'})) {
+                $resolved = $this->lookupPointer((string)$part->{'$ref'});
+                if ($resolved === null) {
+                    $this->issue('error', $path . '/allOf/' . $i, 'Không giải được $ref trong allOf: ' . $part->{'$ref'});
+                    return null;
+                }
+                if (!($resolved instanceof stdClass)) {
+                    $this->issue('error', $path . '/allOf/' . $i, 'Đích $ref trong allOf không phải object.');
+                    return null;
+                }
+                $piece = $this->shallowMergeObjects($resolved, $part, ['$ref']);
+            }
+            $merged = $this->shallowMergeObjects($merged, $piece, []);
+        }
+
+        $this->issue('info', $path, 'Đã gộp ' . count($parts) . ' schema trong `allOf`.');
+        return $merged;
+    }
+
+    private function shallowMergeObjects(stdClass $a, stdClass $b, array $skipKeys): stdClass
+    {
+        $out = clone $a;
+        foreach (get_object_vars($b) as $k => $v) {
+            if (in_array($k, $skipKeys, true)) continue;
+            if ($k === 'properties' && ($out->properties ?? null) instanceof stdClass && $v instanceof stdClass) {
+                $props = clone $out->properties;
+                foreach (get_object_vars($v) as $pk => $pv) {
+                    $props->$pk = $pv;
+                }
+                $out->properties = $props;
+            } elseif ($k === 'required' && is_array($v)) {
+                $out->required = array_values(array_unique(array_merge(
+                    is_array($out->required ?? null) ? $out->required : [],
+                    $v
+                )));
+            } elseif ($k === 'allOf' && is_array($v)) {
+                // Lồng allOf – nối vào để vòng sau xử lý (hiếm)
+                $existing = is_array($out->allOf ?? null) ? $out->allOf : [];
+                $out->allOf = array_merge($existing, $v);
+            } else {
+                $out->$k = $v;
+            }
+        }
+        return $out;
     }
 }

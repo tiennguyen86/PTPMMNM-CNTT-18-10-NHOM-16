@@ -78,18 +78,18 @@ function save_validation_run(array $version, string $target, string $title, stri
     $errors = (new SchemaValidator())->validate($tree, $data);
     $errCount = count(array_filter($errors, fn($e) => $e['level'] === 'error'));
 
-    db()->beginTransaction();
-    $runId = insert('validation_runs', [
-        'endpoint_id' => $version['endpoint_id'], 'version_id' => $version['id'], 'target' => $target,
-        'title' => $title, 'sample_json' => $json,
-        'status' => $errCount ? 'fail' : 'pass', 'error_count' => $errCount, 'warning_count' => count($errors) - $errCount,
-        'created_by' => current_user()['id'], 'created_at' => now(),
-    ]);
-    foreach ($errors as $e) {
-        insert('validation_errors', ['run_id' => $runId] + error_row($e));
-    }
-    db()->commit();
-    return $runId;
+    return db_transaction(function () use ($version, $target, $title, $json, $errors, $errCount) {
+        $runId = insert('validation_runs', [
+            'endpoint_id' => $version['endpoint_id'], 'version_id' => $version['id'], 'target' => $target,
+            'title' => $title, 'sample_json' => $json,
+            'status' => $errCount ? 'fail' : 'pass', 'error_count' => $errCount, 'warning_count' => count($errors) - $errCount,
+            'created_by' => current_user()['id'], 'created_at' => now(),
+        ]);
+        foreach ($errors as $e) {
+            insert('validation_errors', ['run_id' => $runId] + error_row($e));
+        }
+        return $runId;
+    });
 }
 
 /** Danh sách endpoint người dùng được xem (dùng cho bộ lọc). */

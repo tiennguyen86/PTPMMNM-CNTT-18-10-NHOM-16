@@ -1,6 +1,11 @@
 <?php
 defined('APP') or exit;
 
+if (!config('allow_register')) {
+    flash('info', 'Đăng ký công khai đang tắt. Liên hệ quản trị để được cấp tài khoản.');
+    redirect('login');
+}
+
 if (current_user()) redirect('dashboard');
 
 $form = ['username' => '', 'full_name' => '', 'email' => ''];

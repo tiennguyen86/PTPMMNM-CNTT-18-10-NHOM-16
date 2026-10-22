@@ -65,6 +65,7 @@ $members = rows('SELECT m.*, u.username, u.full_name, u.email FROM project_membe
 $actions = '';
 if (role_at_least($role, 'editor')) {
     $actions .= '<a class="btn btn-primary" href="' . e(url('endpoint_form', ['project_id' => $id])) . '">' . icon('plus') . 'Thêm endpoint</a>';
+    $actions .= '<a class="btn" href="' . e(url('import_openapi', ['project_id' => $id])) . '">' . icon('upload') . 'Import OpenAPI</a>';
 }
 if (role_at_least($role, 'owner')) {
     $actions .= '<a class="btn" href="' . e(url('project_form', ['id' => $id])) . '">' . icon('edit') . 'Sửa</a>';

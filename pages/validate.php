@@ -18,6 +18,10 @@ $form = [
     'target' => $fromRun['target'] ?? 'response',
     'title' => $fromRun ? $fromRun['title'] . ' (chạy lại)' : 'Kiểm tra ' . date('d/m/Y H:i'),
     'sample' => $fromRun['sample_json'] ?? '',
+    'fetch_url' => '',
+    'fetch_method' => 'GET',
+    'fetch_headers' => '',
+    'fetch_body' => '',
 ];
 $errors = [];
 
@@ -25,8 +29,26 @@ if (is_post()) {
     $form['version_id'] = (int)post('version_id');
     $form['target'] = isset(TARGETS[post('target')]) ? post('target') : 'response';
     $form['title'] = post('title') ?: 'Kiểm tra ' . date('d/m/Y H:i');
+    $form['fetch_url'] = post('fetch_url');
+    $form['fetch_method'] = strtoupper(post('fetch_method') ?: 'GET');
+    $form['fetch_headers'] = post('fetch_headers');
+    $form['fetch_body'] = post('fetch_body');
     [$form['sample'], $fileErr] = read_json_input('sample', 'sample_file');
     if ($fileErr) $errors[] = $fileErr;
+
+    // Gọi API live (ưu tiên nếu có URL)
+    if ($form['fetch_url'] !== '') {
+        $headers = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $form['fetch_headers']))));
+        $fetched = http_fetch_json($form['fetch_url'], $form['fetch_method'], $headers, $form['fetch_body'] ?: null);
+        if (!$fetched['ok']) {
+            $errors[] = $fetched['error'];
+        } else {
+            $form['sample'] = $fetched['body'] ?? '';
+            if ($form['title'] === '' || str_starts_with($form['title'], 'Kiểm tra ')) {
+                $form['title'] = 'Live ' . ($fetched['status'] ?? '') . ' ' . $form['fetch_method'] . ' ' . mb_substr($form['fetch_url'], 0, 120);
+            }
+        }
+    }
 
     $version = row('SELECT * FROM schema_versions WHERE id = ? AND endpoint_id = ?', [$form['version_id'], $endpointId]);
     if (!$version) {
@@ -38,7 +60,7 @@ if (is_post()) {
 
     $data = null;
     if ($form['sample'] === '') {
-        $errors[] = 'Vui lòng nhập hoặc tải lên dữ liệu mẫu.';
+        $errors[] = 'Vui lòng nhập/tải dữ liệu mẫu hoặc gọi API live.';
     } else {
         try {
             $data = json_decode($form['sample'], false, 512, JSON_THROW_ON_ERROR);
@@ -64,7 +86,7 @@ page_head('Kiểm tra dữ liệu mẫu', [
     $ep['project_name'] => url('project', ['id' => $ep['project_id']]),
     $ep['method'] . ' ' . $ep['path'] => url('endpoint', ['id' => $endpointId]),
     'Kiểm tra dữ liệu' => null,
-], '', 'Dán phản hồi thực tế của API (hoặc tải tệp JSON) để kiểm tra có đúng bản mô tả hay không. Kết quả được lưu lại để tra cứu.');
+], '', 'Dán phản hồi thực tế, tải tệp JSON, hoặc gọi API live (http/https công khai) rồi kiểm tra theo bản mô tả.');
 ?>
 <?php foreach ($errors as $err): ?><div class="alert alert-error"><?= e($err) ?></div><?php endforeach; ?>
 
@@ -87,6 +109,30 @@ page_head('Kiểm tra dữ liệu mẫu', [
             <label class="field"><span>Tiêu đề lần kiểm tra</span><input class="input" name="title" value="<?= e($form['title']) ?>" maxlength="200"></label>
         </div>
     </section>
+
+    <section class="card">
+        <div class="card-head"><h2>Gọi API live (tuỳ chọn)</h2></div>
+        <div class="card-body stack">
+            <p class="muted small">Chỉ gọi URL http/https công khai (chặn localhost/IP nội bộ). Nếu điền URL, phản hồi sẽ dùng làm dữ liệu mẫu.</p>
+            <div class="grid-method">
+                <label class="field"><span>Method</span>
+                    <select class="input" name="fetch_method">
+                        <?php foreach (HTTP_METHODS as $m): ?><option value="<?= e($m) ?>"<?= selected($m, $form['fetch_method']) ?>><?= e($m) ?></option><?php endforeach; ?>
+                    </select>
+                </label>
+                <label class="field"><span>URL</span>
+                    <input class="input mono" name="fetch_url" value="<?= e($form['fetch_url']) ?>" placeholder="https://api.example.com/users/1">
+                </label>
+            </div>
+            <label class="field"><span>Headers (mỗi dòng: Name: value)</span>
+                <textarea class="input code" name="fetch_headers" rows="3" placeholder="Authorization: Bearer &#8230;&#10;Accept: application/json"><?= e($form['fetch_headers']) ?></textarea>
+            </label>
+            <label class="field"><span>Body (nếu POST/PUT/PATCH)</span>
+                <textarea class="input code" name="fetch_body" rows="4" spellcheck="false"><?= e($form['fetch_body']) ?></textarea>
+            </label>
+        </div>
+    </section>
+
     <section class="card">
         <div class="card-head"><h2>Dữ liệu mẫu (JSON)</h2><button type="button" class="btn btn-sm btn-ghost" data-format="sample">Định dạng JSON</button></div>
         <div class="card-body stack">
@@ -94,7 +140,7 @@ page_head('Kiểm tra dữ liệu mẫu', [
                 <?= icon('upload') ?><span>Chọn tệp .json chứa phản hồi mẫu</span>
                 <input type="file" name="sample_file" accept=".json,.txt,application/json" data-load-into="sample">
             </label>
-            <textarea class="input code" id="sample" name="sample" rows="20" spellcheck="false" data-json placeholder='{ "id": 1, "username": "nguyenvana", ... }'><?= e($form['sample']) ?></textarea>
+            <textarea class="input code" id="sample" name="sample" rows="16" spellcheck="false" data-json placeholder='{ "id": 1, "username": "nguyenvana", ... }'><?= e($form['sample']) ?></textarea>
             <div class="json-status" data-status-for="sample"></div>
         </div>
     </section>

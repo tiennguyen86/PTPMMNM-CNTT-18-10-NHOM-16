@@ -7,13 +7,19 @@ $username = '';
 $error = null;
 if (is_post()) {
     $username = post('username');
-    $user = row('SELECT * FROM users WHERE username = ?', [$username]);
-    if ($user && password_verify(post('password'), $user['password_hash'])) {
-        login_user($user);
-        flash('success', 'Xin chào ' . $user['full_name'] . '!');
-        redirect('dashboard');
+    if ($locked = login_rate_limited($username)) {
+        $error = $locked;
+    } else {
+        $user = row('SELECT * FROM users WHERE username = ?', [$username]);
+        if ($user && password_verify(post('password'), $user['password_hash'])) {
+            record_login_attempt($username, true);
+            login_user($user);
+            flash('success', 'Xin chào ' . $user['full_name'] . '!');
+            redirect('dashboard');
+        }
+        record_login_attempt($username, false);
+        $error = 'Sai tên đăng nhập hoặc mật khẩu.';
     }
-    $error = 'Sai tên đăng nhập hoặc mật khẩu.';
 }
 
 auth_layout_start('Đăng nhập');
@@ -27,7 +33,10 @@ auth_layout_start('Đăng nhập');
     <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required></label>
     <button class="btn btn-primary btn-block">Đăng nhập</button>
 </form>
+<?php if (config('allow_register')): ?>
 <p class="muted center">Chưa có tài khoản? <a href="<?= e(url('register')) ?>">Đăng ký</a></p>
+<?php endif; ?>
+<?php if (config('debug')): ?>
 <div class="demo-accounts">
     <strong>Tài khoản dùng thử</strong>
     <table>
@@ -37,4 +46,5 @@ auth_layout_start('Đăng nhập');
         <tr><td><code>tester</code> / <code>123456</code></td><td>Thành viên – chỉ xem</td></tr>
     </table>
 </div>
+<?php endif; ?>
 <?php auth_layout_end();

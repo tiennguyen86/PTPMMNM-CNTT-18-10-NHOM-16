@@ -1,0 +1,4 @@
+# Chặn truy cập trực tiếp tệp cấu hình / môi trường
+<FilesMatch "^(config\.php|\.env|\.env\..*)$">
+    Require all denied
+</FilesMatch>

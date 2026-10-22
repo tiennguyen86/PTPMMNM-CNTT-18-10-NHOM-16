@@ -18,10 +18,11 @@ if (is_post()) {
             update('projects', $form + ['updated_at' => now()], 'id = ?', [$id]);
             flash('success', 'Đã cập nhật dự án.');
         } else {
-            db()->beginTransaction();
-            $id = insert('projects', $form + ['created_by' => $user['id'], 'created_at' => now(), 'updated_at' => now()]);
-            insert('project_members', ['project_id' => $id, 'user_id' => $user['id'], 'role' => 'owner', 'added_at' => now()]);
-            db()->commit();
+            $id = db_transaction(function () use ($form, $user) {
+                $id = insert('projects', $form + ['created_by' => $user['id'], 'created_at' => now(), 'updated_at' => now()]);
+                insert('project_members', ['project_id' => $id, 'user_id' => $user['id'], 'role' => 'owner', 'added_at' => now()]);
+                return $id;
+            });
             flash('success', 'Đã tạo dự án. Bạn là người phụ trách API của dự án này.');
         }
         redirect('project', ['id' => $id]);

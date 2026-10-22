@@ -4,7 +4,7 @@
  * Chặn truy cập trực tiếp các thư mục nội bộ (Apache/XAMPP đã chặn bằng .htaccess).
  */
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (preg_match('#^/(app|pages|database)(/|$)|^/config\.php$#', $path)) {
+if (preg_match('#^/(app|pages|database|cli|tests)(/|$)|^/(config\.php|\.env)$#', $path)) {
     http_response_code(403);
     exit('Forbidden');
 }

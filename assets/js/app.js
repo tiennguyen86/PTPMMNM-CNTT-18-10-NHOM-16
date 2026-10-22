@@ -123,4 +123,14 @@
     document.querySelectorAll('[data-print]').forEach(function (btn) {
         btn.addEventListener('click', function () { window.print(); });
     });
+
+    // Checkbox "chọn tất cả" (import OpenAPI)
+    document.querySelectorAll('[data-check-all]').forEach(function (master) {
+        master.addEventListener('change', function () {
+            var name = master.dataset.checkAll;
+            document.querySelectorAll('input[type=checkbox][name="' + name + '"]').forEach(function (cb) {
+                cb.checked = master.checked;
+            });
+        });
+    });
 })();

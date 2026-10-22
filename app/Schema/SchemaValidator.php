@@ -77,8 +77,9 @@ class SchemaValidator
                 if (isset($c['maxItems']) && $n > $c['maxItems']) {
                     $this->add('error', 'CONSTRAINT_VIOLATION', $path, "Mảng có tối đa {$c['maxItems']} phần tử.", '≤ ' . $c['maxItems'] . ' phần tử', $n . ' phần tử');
                 }
+                $items = $node['items'] ?? ['type' => 'any', 'nullable' => true];
                 foreach ($v as $i => $item) {
-                    $this->check($node['items'], $item, $path . '[' . $i . ']');
+                    $this->check($items, $item, $path . '[' . $i . ']');
                 }
                 break;
 
@@ -93,8 +94,13 @@ class SchemaValidator
                 if (isset($c['maxLength']) && $len > $c['maxLength']) {
                     $this->add('error', 'CONSTRAINT_VIOLATION', $path, "Chuỗi tối đa {$c['maxLength']} ký tự.", 'độ dài ≤ ' . $c['maxLength'], 'độ dài ' . $len);
                 }
-                if (isset($c['pattern']) && @preg_match(self::regex($c['pattern']), $v) === 0) {
-                    $this->add('error', 'CONSTRAINT_VIOLATION', $path, 'Chuỗi không khớp mẫu yêu cầu.', $c['pattern'], self::preview($v));
+                if (isset($c['pattern'])) {
+                    $match = self::safePregMatch($c['pattern'], $v);
+                    if ($match === false) {
+                        $this->add('warning', 'CONSTRAINT_VIOLATION', $path, 'Không kiểm tra được `pattern` (biểu thức không an toàn hoặc không hợp lệ).', $c['pattern'], self::preview($v));
+                    } elseif ($match === 0) {
+                        $this->add('error', 'CONSTRAINT_VIOLATION', $path, 'Chuỗi không khớp mẫu yêu cầu.', $c['pattern'], self::preview($v));
+                    }
                 }
                 break;
 
@@ -174,6 +180,31 @@ class SchemaValidator
     public static function regex(string $pattern): string
     {
         return '~' . str_replace('~', '\~', $pattern) . '~u';
+    }
+
+    /** Độ dài pattern tối đa để giảm ReDoS. */
+    public const PATTERN_MAX_LENGTH = 200;
+
+    /**
+     * Kiểm tra pattern có quá phức tạp / nguy hiểm không.
+     * Không chứng minh được an toàn tuyệt đối – chỉ lọc các mẫu thường gây ReDoS.
+     */
+    public static function isSafePattern(string $pattern): bool
+    {
+        if ($pattern === '' || strlen($pattern) > self::PATTERN_MAX_LENGTH) return false;
+        // Lồng quantifier kiểu (a+)+, (a*)*, (a+){2,}, v.v.
+        if (preg_match('/\((?:[^()\\\\]|\\\\.)*[+*]\)[+*{]/', $pattern)) return false;
+        if (preg_match('/\((?:[^()\\\\]|\\\\.)*[+*]\)\{/', $pattern)) return false;
+        // Nhiều .* hoặc .+ liền nhau
+        if (preg_match('/(\.\*[+?]?){3,}|(\.\+[+?]?){3,}/', $pattern)) return false;
+        return @preg_match(self::regex($pattern), '') !== false;
+    }
+
+    /** @return int|false 1 khớp, 0 không khớp, false lỗi/không an toàn */
+    public static function safePregMatch(string $pattern, string $subject)
+    {
+        if (!self::isSafePattern($pattern)) return false;
+        return @preg_match(self::regex($pattern), $subject);
     }
 
     public static function checkFormat(string $format, string $v): bool

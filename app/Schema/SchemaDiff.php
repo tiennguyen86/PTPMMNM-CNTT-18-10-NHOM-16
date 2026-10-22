@@ -103,7 +103,11 @@ class SchemaDiff
         $this->compareConstraints($o, $n, $path);
 
         if ($o['type'] === 'object') $this->compareProperties($o, $n, $path);
-        if ($o['type'] === 'array') $this->node($o['items'], $n['items'], $path . '[]');
+        if ($o['type'] === 'array') {
+            $oi = $o['items'] ?? ['type' => 'any', 'nullable' => true];
+            $ni = $n['items'] ?? ['type' => 'any', 'nullable' => true];
+            $this->node($oi, $ni, $path . '[]');
+        }
     }
 
     private function compareEnum(array $o, array $n, string $path): void

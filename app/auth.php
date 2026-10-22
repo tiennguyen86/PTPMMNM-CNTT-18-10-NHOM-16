@@ -98,6 +98,10 @@ function load_version(int $id, string $min = 'viewer'): array
  */
 function project_scope(string $column = 'p.id'): array
 {
+    // Chỉ cho phép identifier dạng bảng.cột hoặc cột đơn
+    if (!preg_match('/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?$/i', $column)) {
+        throw new InvalidArgumentException('Cột scope không hợp lệ.');
+    }
     if (is_admin()) return ['1 = 1', []];
     return ["$column IN (SELECT project_id FROM project_members WHERE user_id = ?)", [current_user()['id']]];
 }

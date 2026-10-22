@@ -57,7 +57,7 @@ page_head(e($title), ['Dự án' => url('projects'), $project['name'] => url('pr
             <div class="grid-method">
                 <label class="field"><span>Phương thức</span>
                     <select class="input" name="method">
-                        <?php foreach (HTTP_METHODS as $m): ?><option<?= selected($m, $form['method']) ?>><?= $m ?></option><?php endforeach; ?>
+                        <?php foreach (HTTP_METHODS as $m): ?><option value="<?= e($m) ?>"<?= selected($m, $form['method']) ?>><?= e($m) ?></option><?php endforeach; ?>
                     </select>
                 </label>
                 <label class="field"><span>Đường dẫn (endpoint) *</span><input class="input mono" name="path" value="<?= e($form['path']) ?>" required placeholder="/api/users/{id}"></label>
