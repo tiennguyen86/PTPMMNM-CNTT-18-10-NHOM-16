@@ -6,3 +6,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
+
+COPY docker/php/lab-entrypoint.sh /usr/local/bin/lab-entrypoint.sh
+RUN chmod +x /usr/local/bin/lab-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/lab-entrypoint.sh"]

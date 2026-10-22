@@ -1,6 +1,6 @@
 # Lab 05 — Lưu, truy vấn và thống kê đăng ký với postgresql
 
-Mã mẫu cho phần hướng dẫn và mã khởi đầu cho bài tự làm.
+Mã mẫu và phần mở rộng đã hoàn thiện theo yêu cầu trong `../HUONG_DAN.md`.
 
 ## Mở bài
 
@@ -22,7 +22,7 @@ bash lab.sh test
 bash lab.sh extend
 ```
 
-`test` kiểm tra phần mẫu; `extend` kiểm tra phần tự làm. Các vị trí TODO là nhiệm vụ cần hoàn thiện; không sửa test để bỏ qua lỗi.
+`test` kiểm tra phần mẫu; `extend` kiểm tra phần mở rộng đã hoàn thiện. Các bộ kiểm thử gốc được giữ nguyên.
 
 Kết quả mở rộng cần đạt: `TESTS=4 FAILED=0`. Có luồng Form lưu đăng ký thật, chống trùng theo sự kiện–email, tra cứu danh sách và thống kê cả sự kiện chưa có người đăng ký.
 
@@ -52,4 +52,16 @@ Khu thử có 96 ghế cố định, 68 khả dụng (16 VIP và 52 Tiêu chuẩ
 
 Ảnh SVG tự tạo, lưu cục bộ và ghi quyền CC0 trong `public/assets/images/LICENSE.txt`. `presentation.js` chỉ xử lý ảnh lỗi; `ticket-preview.js` chỉ chạy trên trang thử. Khi tắt JavaScript, vẫn đọc được nội dung và dùng form lab như cũ; khu chọn thử được khóa kèm giải thích.
 
-Không đưa ID demo, vé hoặc ghế vào form, Session, Cookie, CSDL hoặc test cũ. TODO sinh viên và đáp án giữ nguyên khác biệt. Không có backend bán vé, thanh toán hoặc gửi email.
+Không đưa ID demo, vé hoặc ghế vào form, Session, Cookie, CSDL hoặc test cũ. Phần mở rộng nghiệp vụ được thực hiện độc lập với khu thử giao diện. Không có backend bán vé, thanh toán hoặc gửi email.
+
+## Phần mở rộng đã hoàn thiện
+
+`src/RegistrationStats.php` dùng `$1` với `LEFT JOIN` từ `events` sang `registrations`, đếm `COUNT(r.id)` và nhóm theo sự kiện. Kết quả gồm `event_id` và `total` kiểu `int`, `title` kiểu chuỗi. Sự kiện trống có tổng 0; ID không tồn tại trả `[]`. Lỗi SQL được chuyển tiếp, không giả thành tổng 0 hoặc danh sách rỗng.
+
+Kiểm thử bổ sung cần cùng kết nối PostgreSQL như `test`/`extend`:
+
+```bash
+php tests/stats-regression.php
+```
+
+Kết quả: mẫu `TESTS=6 FAILED=0`, tích hợp `TESTS=7 FAILED=0`, mở rộng `TESTS=4 FAILED=0`, hồi quy `TESTS=4 FAILED=0`. Các fixture thống kê chạy trong transaction và rollback khi kết thúc.

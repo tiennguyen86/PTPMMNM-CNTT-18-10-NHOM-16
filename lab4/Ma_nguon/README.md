@@ -1,6 +1,6 @@
 # Lab 04 — Quản lý bản nháp bằng session và cookie
 
-Mã mẫu cho phần hướng dẫn và mã khởi đầu cho bài tự làm.
+Mã mẫu và phần mở rộng đã hoàn thiện theo yêu cầu trong `../HUONG_DAN.md`.
 
 ## Mở bài
 
@@ -22,7 +22,7 @@ bash lab.sh test
 bash lab.sh extend
 ```
 
-`test` kiểm tra phần mẫu; `extend` kiểm tra phần tự làm. Các vị trí TODO là nhiệm vụ cần hoàn thiện; không sửa test để bỏ qua lỗi.
+`test` kiểm tra phần mẫu; `extend` kiểm tra phần mở rộng đã hoàn thiện. Các bộ kiểm thử gốc được giữ nguyên.
 
 Kết quả mở rộng cần đạt: `TESTS=7 FAILED=0`. Có luồng nhập, xem lại, sửa, hủy và hoàn tất mô phỏng; bản nháp sai hoặc hết hạn bị từ chối; các phiên sử dụng và tùy chọn giao diện tách biệt.
 
@@ -52,4 +52,18 @@ Khu thử có 96 ghế cố định, 68 khả dụng (16 VIP và 52 Tiêu chuẩ
 
 Ảnh SVG tự tạo, lưu cục bộ và ghi quyền CC0 trong `public/assets/images/LICENSE.txt`. `presentation.js` chỉ xử lý ảnh lỗi; `ticket-preview.js` chỉ chạy trên trang thử. Khi tắt JavaScript, vẫn đọc được nội dung và dùng form lab như cũ; khu chọn thử được khóa kèm giải thích.
 
-Không đưa ID demo, vé hoặc ghế vào form, Session, Cookie, CSDL hoặc test cũ. TODO sinh viên và đáp án giữ nguyên khác biệt. Không có backend bán vé, thanh toán hoặc gửi email.
+Không đưa ID demo, vé hoặc ghế vào form, Session, Cookie, CSDL hoặc test cũ. Phần mở rộng nghiệp vụ được thực hiện độc lập với khu thử giao diện. Không có backend bán vé, thanh toán hoặc gửi email.
+
+## Phần mở rộng đã hoàn thiện
+
+- `src/DraftGuard.php`: chỉ chấp nhận nháp có cấu trúc hợp lệ, đúng ID sự kiện, timestamp nguyên không ở tương lai, TTL dương và tuổi nhỏ hơn TTL. Đúng ngưỡng hết hạn bị từ chối.
+- `public/confirm.php`: kiểm tra nháp trước khi hiển thị, gửi `event_id` ẩn cùng token CSRF khi xác nhận.
+- `public/complete.php`: giữ kiểm tra CSRF, từ chối ID thiếu/sai/không phải số nguyên; chỉ ghi `SIMULATED_OK` sau khi guard chấp nhận. Không ghi CSDL.
+
+Kiểm thử bổ sung dữ liệu sai và biên:
+
+```bash
+php tests/guard-regression.php
+```
+
+Kết quả: mẫu `TESTS=6 FAILED=0`, mở rộng `TESTS=7 FAILED=0`, hồi quy `TESTS=14 FAILED=0`.
